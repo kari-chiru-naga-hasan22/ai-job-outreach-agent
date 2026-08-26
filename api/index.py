@@ -2,20 +2,8 @@ import os
 import json
 import urllib.request
 import urllib.parse
-from typing import List, Dict, Any, Tuple
-from fastapi import FastAPI, HTTPException
-from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
-
-app = FastAPI(title="Job Scout API")
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+from http.server import BaseHTTPRequestHandler
+from typing import List, Dict, Any
 
 OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
 
@@ -143,6 +131,21 @@ UNIVERSAL_ECOSYSTEMS = {
     ],
     "ai": [
         {
+            "company": "Tapza Technologies",
+            "role": "AI Engineering Intern",
+            "location": "Hyderabad",
+            "paid_confirmed": True,
+            "paid_source": "Confirmed (₹15,000 – ₹25,000/month)",
+            "apply_link": "https://wellfound.com/company/tapza-technologies/jobs/3233261-ai-engineering-intern",
+            "contact_name": "Vasu Mannem",
+            "contact_title": "Co-Founder & Director",
+            "contact_linkedin_url": "https://www.linkedin.com/in/vasu-mannem",
+            "hr_contact": "Tapza Talent Team — https://www.linkedin.com/company/tapza-technologies",
+            "tech_contact": "Agentic AI Lead — https://www.linkedin.com/company/tapza-technologies/people",
+            "ceo_contact": "Vasu Mannem, Co-Founder — https://www.linkedin.com/in/vasu-mannem",
+            "why_it_fits": "Healthcare tech building agentic workflows with LangGraph and LLMs. Reaching out directly to Vasu with a working agent demo yields high interview conversion."
+        },
+        {
             "company": "Cognida.ai",
             "role": "GenAI Engineer Intern",
             "location": "Hyderabad",
@@ -156,21 +159,6 @@ UNIVERSAL_ECOSYSTEMS = {
             "tech_contact": "Gopalakrishna Kuppuswamy, Co-Founder & CTO — https://www.linkedin.com/in/gopalakrishna-kuppuswamy",
             "ceo_contact": "Feroze Mohammed, Founder & CEO — https://www.linkedin.com/in/feroze-mohammed",
             "why_it_fits": "Raised a $15M Series A for enterprise agentic AI. CTO Gopalakrishna actively posts on agentic deployment—reach out to him with working agentic code."
-        },
-        {
-            "company": "Stackular",
-            "role": "AI/ML Intern – Agentic AI",
-            "location": "Hyderabad",
-            "paid_confirmed": True,
-            "paid_source": "Confirmed (₹35,000/month)",
-            "apply_link": "https://stackular.com/careers",
-            "contact_name": "Autonomous AI Team",
-            "contact_title": "AI Platform Lead",
-            "contact_linkedin_url": "https://www.linkedin.com/company/stackular",
-            "hr_contact": "Stackular Talent Acquisition — https://www.linkedin.com/company/stackular",
-            "tech_contact": "Autonomous AI / LangChain Lead — https://www.linkedin.com/company/stackular/people",
-            "ceo_contact": "Stackular Founding Leadership — https://www.linkedin.com/company/stackular/about",
-            "why_it_fits": "Dedicated team building multi-agent systems and RAG pipelines at Raidurg, Hyderabad."
         }
     ]
 }
@@ -184,71 +172,93 @@ def get_fallback_leads(role: str) -> List[Dict[str, Any]]:
     else:
         return UNIVERSAL_ECOSYSTEMS["ai"]
 
-class SearchRequest(BaseModel):
-    role: str = "Embedded Systems Engineer Intern"
-    location: str = "Hyderabad"
-    job_type: str = "Internship"
-    paid_only: bool = True
+class handler(BaseHTTPRequestHandler):
+    def _send_json(self, status_code: int, data: Any):
+        self.send_response(status_code)
+        self.send_header('Content-Type', 'application/json')
+        self.send_header('Access-Control-Allow-Origin', '*')
+        self.send_header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
+        self.send_header('Access-Control-Allow-Headers', 'Content-Type, Authorization')
+        self.end_headers()
+        self.wfile.write(json.dumps(data).encode('utf-8'))
 
-@app.get("/api/health")
-async def health():
-    return {
-        "status": "healthy",
-        "model_id": "meta-llama/llama-3.3-70b-instruct",
-        "api_key_configured": bool(os.getenv("OPENROUTER_API_KEY"))
-    }
+    def do_OPTIONS(self):
+        self.send_response(200)
+        self.send_header('Access-Control-Allow-Origin', '*')
+        self.send_header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
+        self.send_header('Access-Control-Allow-Headers', 'Content-Type, Authorization')
+        self.end_headers()
 
-@app.post("/api/search")
-async def search(req: SearchRequest):
-    api_key = os.getenv("OPENROUTER_API_KEY", "").strip()
-    model_id = os.getenv("OPENROUTER_MODEL_ID", "meta-llama/llama-3.3-70b-instruct").strip()
+    def do_GET(self):
+        self._send_json(200, {
+            "status": "healthy",
+            "model_id": os.getenv("OPENROUTER_MODEL_ID", "meta-llama/llama-3.3-70b-instruct"),
+            "api_key_configured": bool(os.getenv("OPENROUTER_API_KEY"))
+        })
 
-    if not api_key:
-        leads = get_fallback_leads(req.role)
-        return {
-            "success": True,
-            "leads": leads,
-            "count": len(leads),
-            "model_used": "Verified Ecosystem Scout"
-        }
+    def do_POST(self):
+        content_len = int(self.headers.get('Content-Length', 0))
+        post_body = self.rfile.read(content_len) if content_len > 0 else b'{}'
+        
+        try:
+            req = json.loads(post_body.decode('utf-8'))
+        except Exception:
+            req = {}
 
-    try:
-        user_query = f"Find currently open, verified PAID {req.job_type} and jobs for '{req.role}' at companies located in '{req.location}, India'. Attach verified executive LinkedIn contacts (HR, Tech Lead, CEO) and return strictly the JSON leads structure."
-        payload = {
-            "model": model_id,
-            "messages": [
-                {"role": "system", "content": UNIVERSAL_SYSTEM_PROMPT},
-                {"role": "user", "content": user_query}
-            ],
-            "temperature": 0.2
-        }
+        role = req.get("role", "Embedded Systems Engineer Intern")
+        location = req.get("location", "Hyderabad")
+        job_type = req.get("job_type", "Internship")
 
-        request_obj = urllib.request.Request(
-            OPENROUTER_URL,
-            data=json.dumps(payload).encode("utf-8"),
-            headers={
-                "Authorization": f"Bearer {api_key}",
-                "Content-Type": "application/json"
+        api_key = os.getenv("OPENROUTER_API_KEY", "").strip()
+        model_id = os.getenv("OPENROUTER_MODEL_ID", "meta-llama/llama-3.3-70b-instruct").strip()
+
+        if not api_key:
+            leads = get_fallback_leads(role)
+            self._send_json(200, {
+                "success": True,
+                "leads": leads,
+                "count": len(leads),
+                "model_used": "Verified Ecosystem Scout"
+            })
+            return
+
+        try:
+            user_query = f"Find currently open, verified PAID {job_type} and jobs for '{role}' at companies located in '{location}, India'. Attach verified executive LinkedIn contacts (HR, Tech Lead, CEO) and return strictly the JSON leads structure."
+            payload = {
+                "model": model_id,
+                "messages": [
+                    {"role": "system", "content": UNIVERSAL_SYSTEM_PROMPT},
+                    {"role": "user", "content": user_query}
+                ],
+                "temperature": 0.2
             }
-        )
 
-        with urllib.request.urlopen(request_obj, timeout=25) as resp:
-            data = json.loads(resp.read().decode("utf-8"))
+            request_obj = urllib.request.Request(
+                OPENROUTER_URL,
+                data=json.dumps(payload).encode("utf-8"),
+                headers={
+                    "Authorization": f"Bearer {api_key}",
+                    "Content-Type": "application/json"
+                }
+            )
 
-        content = data.get("choices", [{}])[0].get("message", {}).get("content", "")
-        raw_json = content
-        if "```json" in content:
-            raw_json = content.split("```json")[1].split("```")[0].strip()
-        elif "```" in content:
-            raw_json = content.split("```")[1].split("```")[0].strip()
+            with urllib.request.urlopen(request_obj, timeout=20) as resp:
+                data = json.loads(resp.read().decode("utf-8"))
 
-        parsed = json.loads(raw_json)
-        leads = parsed.get("leads", parsed if isinstance(parsed, list) else [])
-        if leads:
-            return {"success": True, "leads": leads, "count": len(leads), "model_used": model_id}
+            content = data.get("choices", [{}])[0].get("message", {}).get("content", "")
+            raw_json = content
+            if "```json" in content:
+                raw_json = content.split("```json")[1].split("```")[0].strip()
+            elif "```" in content:
+                raw_json = content.split("```")[1].split("```")[0].strip()
 
-    except Exception:
-        pass
+            parsed = json.loads(raw_json)
+            leads = parsed.get("leads", parsed if isinstance(parsed, list) else [])
+            if leads:
+                self._send_json(200, {"success": True, "leads": leads, "count": len(leads), "model_used": model_id})
+                return
+        except Exception:
+            pass
 
-    leads = get_fallback_leads(req.role)
-    return {"success": True, "leads": leads, "count": len(leads), "model_used": f"{model_id} (Verified Ecosystem Scout)"}
+        leads = get_fallback_leads(role)
+        self._send_json(200, {"success": True, "leads": leads, "count": len(leads), "model_used": f"{model_id} (Verified Ecosystem Scout)"})
