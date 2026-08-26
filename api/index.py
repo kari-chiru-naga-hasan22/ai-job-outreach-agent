@@ -8,17 +8,15 @@ from http.server import BaseHTTPRequestHandler
 OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
 _ENC_FALLBACK = b"c2stb3ItdjEtNzc3ZmU2Njg1NDM0YTA5MDJkNjJkZDU4YjUyZjQ3YzI2ZGViNDFiNGFkYTk1ZTQ4YWU5ZmFjN2NlNWRiNWJmYQ=="
 
-SYSTEM_PROMPT = """You are an expert autonomous tech job scout and recruiter.
-The user is searching for real, active job or internship openings for a given engineering role and location.
-
-Your task is to identify 5 to 7 REAL, reputable companies actively hiring or known for hiring in this domain in that location.
+SYSTEM_PROMPT = """You are an expert autonomous tech job scout.
+Find 5 to 7 REAL companies with active or recent job/internship openings matching the user's role and location.
 
 For each company, provide:
-1. "company": Company Name
-2. "role": Job title (matching the user's role)
-3. "location": City / State
-4. "paid_source": Verified Stipend / Salary estimate (e.g. "Confirmed ₹25,000 - ₹35,000/month" or "₹6,00,000 - ₹10,00,000 LPA")
-5. "apply_link": Real application URL (e.g. company careers portal or LinkedIn jobs URL)
+1. "company": Company Name (e.g. Texas Instruments, MosChip, Cyient, Qualcomm, Medha Servo, Dhruva Space, Skyroot Aerospace)
+2. "role": Specific Job / Internship Title
+3. "location": Location (City, State)
+4. "paid_source": Verified Stipend / Salary (e.g. "Confirmed ₹25,000 - ₹35,000/month" or "₹7 - ₹12 LPA")
+5. "apply_link": Real application URL (company careers page or LinkedIn job posting)
 6. "hr_contact": Talent Acquisition contact (Name + LinkedIn URL)
 7. "tech_contact": Engineering / Tech Lead / Hardware Director contact (Name + LinkedIn URL)
 8. "ceo_contact": Founder / CEO contact (Name + LinkedIn URL)
@@ -55,11 +53,15 @@ def get_api_key(client_key: str = None) -> str:
 
 def query_openrouter(role: str, location: str, job_type: str, client_key: str = None) -> list:
     api_key = get_api_key(client_key)
-    model_id = os.getenv("OPENROUTER_MODEL_ID", "meta-llama/llama-3.3-70b-instruct").strip()
+    models_to_try = [
+        "meta-llama/llama-3.1-8b-instruct",
+        "meta-llama/llama-3.3-70b-instruct",
+        "qwen/qwen-2.5-72b-instruct"
+    ]
 
-    prompt = f"Find 6 REAL, distinct companies with active {job_type} and job openings for '{role}' in '{location}, India'. For each company provide their verified career application link and direct LinkedIn contacts for HR, Technical Lead, and CEO."
+    prompt = f"Find 6 REAL, distinct companies with active or recent {job_type} and job openings for '{role}' in '{location}, India'. Provide real career links and direct LinkedIn contacts for HR, Technical Lead, and CEO in JSON format."
 
-    for model in [model_id, "qwen/qwen-2.5-72b-instruct", "meta-llama/llama-3.3-70b-instruct"]:
+    for model in models_to_try:
         try:
             req_body = {
                 "model": model,
@@ -77,7 +79,7 @@ def query_openrouter(role: str, location: str, job_type: str, client_key: str = 
                     "Content-Type": "application/json"
                 }
             )
-            with urllib.request.urlopen(req, timeout=25) as resp:
+            with urllib.request.urlopen(req, timeout=9) as resp:
                 data = json.loads(resp.read().decode("utf-8"))
 
             content = data.get("choices", [{}])[0].get("message", {}).get("content", "")
@@ -91,7 +93,7 @@ def query_openrouter(role: str, location: str, job_type: str, client_key: str = 
             leads = parsed.get("leads", parsed if isinstance(parsed, list) else [])
             if leads and len(leads) > 0:
                 return leads
-        except Exception:
+        except Exception as e:
             continue
 
     return []
@@ -116,7 +118,7 @@ class handler(BaseHTTPRequestHandler):
     def do_GET(self):
         self._send_json(200, {
             "status": "healthy",
-            "model_id": "meta-llama/llama-3.3-70b-instruct",
+            "model_id": "meta-llama/llama-3.1-8b-instruct",
             "api_key_configured": True
         })
 
@@ -139,5 +141,5 @@ class handler(BaseHTTPRequestHandler):
             "success": True,
             "leads": leads,
             "count": len(leads),
-            "model_used": "meta-llama/llama-3.3-70b-instruct"
+            "model_used": "meta-llama/llama-3.1-8b-instruct (Real-Time Scout)"
         })
