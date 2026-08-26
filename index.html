@@ -179,6 +179,19 @@
         }
         .btn-apply-main:hover { opacity: 0.92; }
 
+        /* Shimmer Loading */
+        .shimmer-card {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 16px; padding: 1.5rem; display: flex; flex-direction: column; gap: 1rem;
+        }
+        .shimmer-line {
+            background: linear-gradient(90deg, #1e293b 0%, #334155 50%, #1e293b 100%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+            border-radius: 6px;
+        }
+        @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+
         /* Toast */
         .toast {
             position: fixed; bottom: 2rem; right: 2rem;
@@ -195,10 +208,10 @@
 
         <!-- Header -->
         <header>
-            <div class="badge-live"><span class="ping"></span> Universal Talent Scout</div>
+            <div class="badge-live"><span class="ping"></span> Live Autonomous Scout (70B AI Agent)</div>
             <h1>Universal Job & Internship Finder</h1>
             <p class="subtitle">
-                Autonomous talent scout across <strong style="color:#fcd34d;">Embedded Systems, PCB Design, Hardware, VLSI, AI, and Software</strong> with verified compensation and executive LinkedIn contacts.
+                Live autonomous talent scout across <strong style="color:#fcd34d;">Embedded Systems, PCB Design, Hardware, VLSI, AI, and Software</strong> with verified compensation and executive LinkedIn contacts.
             </p>
         </header>
 
@@ -210,7 +223,7 @@
             <form id="searchForm" class="form-grid">
                 <div class="col-span-5">
                     <label>Role / Discipline</label>
-                    <input type="text" id="roleInput" value="Embedded Systems Engineer Intern" placeholder="e.g. PCB Design Intern, Embedded Software" required>
+                    <input type="text" id="roleInput" value="PCB Design Engineer Intern" placeholder="e.g. PCB Design Intern, Embedded Software, VLSI, AI Engineer" required>
                     <div class="preset-pills" id="presetPills"></div>
                 </div>
 
@@ -243,7 +256,7 @@
                             </div>
                         </div>
                     </div>
-                    <button type="submit" class="btn-search" id="searchBtn">🔍 Search Opportunities</button>
+                    <button type="submit" class="btn-search" id="searchBtn">🔍 Search Real Opportunities</button>
                 </div>
             </form>
         </section>
@@ -251,8 +264,8 @@
         <!-- Results Overview -->
         <div class="results-header">
             <div style="display:flex; align-items:center; gap:0.75rem;">
-                <h2 style="font-size:1.35rem; font-weight:800;" id="resultsTitle">Verified Opportunities</h2>
-                <span class="results-count" id="resultsCount">Loading...</span>
+                <h2 style="font-size:1.35rem; font-weight:800;" id="resultsTitle">Verified Real Opportunities</h2>
+                <span class="results-count" id="resultsCount">Ready to search</span>
             </div>
             <input type="text" id="filterInput" class="filter-input" placeholder="🔍 Filter by company or skill..." onkeyup="filterLeads()">
         </div>
@@ -264,14 +277,14 @@
     <script>
         const DOMAINS = [
             {
-                id: "embedded",
-                name: "⚡ Embedded & Firmware",
-                presets: ["Embedded Systems Engineer Intern", "Firmware Engineer", "IoT Systems Intern", "Microcontroller / RTOS Dev"]
-            },
-            {
                 id: "pcb",
                 name: "🔌 PCB Design & Hardware",
                 presets: ["PCB Design Engineer Intern", "Hardware Design Intern", "Altium Layout Engineer", "Avionics Hardware Intern"]
+            },
+            {
+                id: "embedded",
+                name: "⚡ Embedded & Firmware",
+                presets: ["Embedded Systems Engineer Intern", "Firmware Engineer", "IoT Systems Intern", "Microcontroller / RTOS Dev"]
             },
             {
                 id: "ai",
@@ -290,144 +303,8 @@
             }
         ];
 
-        let currentDomain = "embedded";
+        let currentDomain = "pcb";
         let allLeads = [];
-
-        // Built-in verified offline database so the web app always functions immediately
-        const CLIENT_ECOSYSTEM = {
-            "embedded": [
-                {
-                    company: "MosChip Technologies",
-                    role: "Embedded Systems Engineer Intern",
-                    location: "Hyderabad",
-                    paid_source: "Confirmed (₹20,000 – ₹30,000/month)",
-                    apply_link: "https://moschip.com/careers/",
-                    contact_name: "Srinivasa Rao Kakumanu",
-                    contact_title: "Head of Semiconductor Business",
-                    contact_linkedin_url: "https://www.linkedin.com/in/srinivasa-rao-kakumanu-8b2b712",
-                    hr_contact: "Hyderabad Semiconductor HR — https://www.linkedin.com/company/moschip-technologies",
-                    tech_contact: "Director of Embedded Software — https://www.linkedin.com/company/moschip-technologies/people",
-                    ceo_contact: "Venkata Simhadri, CEO — https://www.linkedin.com/in/venkatasimhadri",
-                    why_it_fits: "Premier semiconductor and embedded systems firm in Hyderabad. Reach out to the Embedded Director with your microcontroller & RTOS firmware repo."
-                },
-                {
-                    company: "Medha Servo Drives",
-                    role: "Embedded Software & Hardware Intern",
-                    location: "Hyderabad",
-                    paid_source: "Confirmed (₹22,000 – ₹28,000/month)",
-                    apply_link: "https://www.medha.com/careers/",
-                    contact_name: "Y. Kashyap",
-                    contact_title: "Managing Director",
-                    contact_linkedin_url: "https://www.linkedin.com/company/medha-servo-drives-pvt-ltd",
-                    hr_contact: "Medha R&D Talent Acquisition — https://www.linkedin.com/company/medha-servo-drives-pvt-ltd",
-                    tech_contact: "Head of Power Electronics & Embedded R&D — https://www.linkedin.com/company/medha-servo-drives-pvt-ltd/people",
-                    ceo_contact: "Y. Kashyap, Managing Director — https://www.linkedin.com/company/medha-servo-drives-pvt-ltd",
-                    why_it_fits: "Heavy power electronics manufacturer in Hyderabad. Pitching the R&D team with your STM32/ARM and CAN-bus projects gets immediate attention."
-                },
-                {
-                    company: "VVDN Technologies",
-                    role: "Embedded Software & IoT Intern",
-                    location: "Hyderabad",
-                    paid_source: "Confirmed (₹18,000 – ₹25,000/month)",
-                    apply_link: "https://www.vvdntech.com/careers",
-                    contact_name: "Puneet Agarwal",
-                    contact_title: "Co-Founder & CEO",
-                    contact_linkedin_url: "https://www.linkedin.com/in/puneet-agarwal-vvdn",
-                    hr_contact: "VVDN University Relations — https://www.linkedin.com/company/vvdn-technologies",
-                    tech_contact: "VP of Embedded & IoT — https://www.linkedin.com/company/vvdn-technologies/people",
-                    ceo_contact: "Puneet Agarwal, CEO — https://www.linkedin.com/in/puneet-agarwal-vvdn",
-                    why_it_fits: "Extensive embedded Linux and firmware labs in Hyderabad. Connecting with the IoT Lead with a GitHub firmware repo fast-tracks interviews."
-                },
-                {
-                    company: "Qualcomm",
-                    role: "Embedded Firmware Engineer",
-                    location: "Hyderabad",
-                    paid_source: "Confirmed (₹8,00,000 – ₹12,00,000 LPA)",
-                    apply_link: "https://qualcomm.wd5.myworkdayjobs.com/External",
-                    contact_name: "Savitri Sharma",
-                    contact_title: "Lead Technical Recruiter",
-                    contact_linkedin_url: "https://www.linkedin.com/company/qualcomm",
-                    hr_contact: "Qualcomm Hyderabad Campus Recruiting — https://www.linkedin.com/company/qualcomm/people",
-                    tech_contact: "Director of Hardware Engineering — https://www.linkedin.com/company/qualcomm/people",
-                    ceo_contact: "Cristiano Amon, CEO — https://www.linkedin.com/in/cristianoamon",
-                    why_it_fits: "Leading wireless chipset designer in Hyderabad. Pitch the engineering director with low-level device drivers."
-                }
-            ],
-            "pcb": [
-                {
-                    company: "Cyient",
-                    role: "PCB Design & Hardware Engineering Intern",
-                    location: "Hyderabad",
-                    paid_source: "Confirmed (₹22,000 – ₹30,000/month)",
-                    apply_link: "https://www.cyient.com/careers",
-                    contact_name: "Karthikeyan Natarajan",
-                    contact_title: "Executive Director & CEO",
-                    contact_linkedin_url: "https://www.linkedin.com/in/karthikeyannatarajan",
-                    hr_contact: "Cyient Campus Hiring — https://www.linkedin.com/company/cyient",
-                    tech_contact: "Lead Hardware & PCB Design Architect — https://www.linkedin.com/company/cyient/people",
-                    ceo_contact: "Karthikeyan Natarajan, CEO — https://www.linkedin.com/in/karthikeyannatarajan",
-                    why_it_fits: "Major aerospace and semiconductor engineering firm in Hyderabad. Reaching out with your Altium Designer / Cadence Allegro PCB portfolio stands out."
-                },
-                {
-                    company: "Dhruva Space",
-                    role: "PCB Layout & Satellite Avionics Intern",
-                    location: "Hyderabad",
-                    paid_source: "Confirmed (₹18,000/month)",
-                    apply_link: "https://www.dhruvaspace.com/careers",
-                    contact_name: "Abhay Egoor",
-                    contact_title: "Co-Founder & CTO",
-                    contact_linkedin_url: "https://www.linkedin.com/in/abhay-egoor",
-                    hr_contact: "Space Talent Acquisition — https://www.linkedin.com/company/dhruva-space/people",
-                    tech_contact: "Abhay Egoor, CTO — https://www.linkedin.com/in/abhay-egoor",
-                    ceo_contact: "Sanjay Nekkanti, CEO — https://www.linkedin.com/in/sanjaynekkanti",
-                    why_it_fits: "Designing multi-layer rigid-flex PCBs for nano-satellite payloads in Hyderabad. Connect with CTO Abhay Egoor showing your high-frequency PCB stackup."
-                },
-                {
-                    company: "Skyroot Aerospace",
-                    role: "Avionics Hardware & PCB Intern",
-                    location: "Hyderabad",
-                    paid_source: "Confirmed Paid (Space Launch Track)",
-                    apply_link: "https://skyroot.in/careers/",
-                    contact_name: "Naga Bharath Daka",
-                    contact_title: "Co-Founder & COO/CTO",
-                    contact_linkedin_url: "https://www.linkedin.com/in/naga-bharath-daka-1848a955",
-                    hr_contact: "Skyroot Talent Team — https://www.linkedin.com/company/skyroot-aerospace",
-                    tech_contact: "Naga Bharath Daka, CTO — https://www.linkedin.com/in/naga-bharath-daka-1848a955",
-                    ceo_contact: "Pawan Kumar Chandana, CEO — https://www.linkedin.com/in/pawankumarchandana",
-                    why_it_fits: "Rocket stage avionics and power distribution PCB design. Reach out to Bharath with your schematics and EMI/EMC compliance understanding."
-                }
-            ],
-            "ai": [
-                {
-                    company: "Tapza Technologies",
-                    role: "AI Engineering Intern",
-                    location: "Hyderabad",
-                    paid_source: "Confirmed (₹15,000 – ₹25,000/month)",
-                    apply_link: "https://wellfound.com/company/tapza-technologies/jobs/3233261-ai-engineering-intern",
-                    contact_name: "Vasu Mannem",
-                    contact_title: "Co-Founder & Director",
-                    contact_linkedin_url: "https://www.linkedin.com/in/vasu-mannem",
-                    hr_contact: "Tapza Talent Team — https://www.linkedin.com/company/tapza-technologies",
-                    tech_contact: "Agentic AI Lead — https://www.linkedin.com/company/tapza-technologies/people",
-                    ceo_contact: "Vasu Mannem, Co-Founder — https://www.linkedin.com/in/vasu-mannem",
-                    why_it_fits: "Healthcare tech building agentic workflows with LangGraph and LLMs. Reaching out directly to Vasu with a working agent demo yields high interview conversion."
-                },
-                {
-                    company: "Cognida.ai",
-                    role: "GenAI Engineer Intern",
-                    location: "Hyderabad",
-                    paid_source: "Confirmed (₹30,000 – ₹40,000/month)",
-                    apply_link: "https://cognida.ai/careers",
-                    contact_name: "Gopalakrishna Kuppuswamy",
-                    contact_title: "Co-Founder & CTO",
-                    contact_linkedin_url: "https://www.linkedin.com/in/gopalakrishna-kuppuswamy",
-                    hr_contact: "Talent Acquisition Hyderabad — https://www.linkedin.com/company/cognida-ai",
-                    tech_contact: "Gopalakrishna Kuppuswamy, CTO — https://www.linkedin.com/in/gopalakrishna-kuppuswamy",
-                    ceo_contact: "Feroze Mohammed, CEO — https://www.linkedin.com/in/feroze-mohammed",
-                    why_it_fits: "Raised $15M Series A for enterprise agentic AI. CTO Gopalakrishna actively posts on agentic deployment—reach out with working agentic code."
-                }
-            ]
-        };
 
         function initTabs() {
             const tabsEl = document.getElementById("domainTabs");
@@ -500,55 +377,72 @@
             const btn = document.getElementById("searchBtn");
             const grid = document.getElementById("jobsGrid");
 
-            btn.innerText = "⏳ Searching...";
-            grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:3rem; color:var(--text-muted);">Scouting verified opportunities...</div>`;
+            btn.innerText = "⏳ Scouting Live Opportunities (70B AI)...";
+            btn.disabled = true;
+
+            grid.innerHTML = `
+                <div class="shimmer-card">
+                    <div class="shimmer-line" style="height:20px; width:40%;"></div>
+                    <div class="shimmer-line" style="height:28px; width:70%;"></div>
+                    <div class="shimmer-line" style="height:60px; width:100%;"></div>
+                    <div class="shimmer-line" style="height:80px; width:100%;"></div>
+                </div>
+                <div class="shimmer-card">
+                    <div class="shimmer-line" style="height:20px; width:40%;"></div>
+                    <div class="shimmer-line" style="height:28px; width:70%;"></div>
+                    <div class="shimmer-line" style="height:60px; width:100%;"></div>
+                    <div class="shimmer-line" style="height:80px; width:100%;"></div>
+                </div>
+            `;
+            document.getElementById("resultsCount").innerText = "Scouting...";
 
             try {
                 const res = await fetch("/api/search", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ role, location, job_type: jobType, paid_only: true })
+                    body: JSON.stringify({ role, location, job_type: jobType })
                 });
 
-                if (res.ok && res.headers.get("content-type")?.includes("json")) {
+                if (res.ok) {
                     const data = await res.json();
                     if (data.leads && data.leads.length > 0) {
                         allLeads = data.leads;
                         renderLeads(allLeads);
-                        btn.innerText = "🔍 Search Opportunities";
+                        btn.innerText = "🔍 Search Real Opportunities";
+                        btn.disabled = false;
                         return;
                     }
                 }
             } catch (e) {
-                console.log("Using client scout database:", e);
+                console.error("Search error:", e);
             }
 
-            // Client-side fallback database
-            const r_low = role.toLowerCase();
-            let fallback = CLIENT_ECOSYSTEM.embedded;
-            if (r_low.includes("pcb") || r_low.includes("hardware")) {
-                fallback = CLIENT_ECOSYSTEM.pcb;
-            } else if (r_low.includes("ai") || r_low.includes("ml") || r_low.includes("software")) {
-                fallback = CLIENT_ECOSYSTEM.ai;
-            }
-            allLeads = fallback;
-            renderLeads(allLeads);
-            btn.innerText = "🔍 Search Opportunities";
+            grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:3rem; color:var(--text-muted);">
+                <div style="font-size:2rem; margin-bottom:0.5rem;">🔎</div>
+                <strong>Search completed.</strong><br>No live listings returned for this specific search query. Try choosing another role preset or location.
+            </div>`;
+            document.getElementById("resultsCount").innerText = "0 Available";
+            btn.innerText = "🔍 Search Real Opportunities";
+            btn.disabled = false;
         }
 
         function renderLeads(leads) {
             const grid = document.getElementById("jobsGrid");
-            document.getElementById("resultsCount").innerText = `${leads.length} Available`;
+            document.getElementById("resultsCount").innerText = `${leads.length} Real Openings Found`;
 
-            if (leads.length === 0) {
+            if (!leads || leads.length === 0) {
                 grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:3rem; color:var(--text-muted);">No matching listings found. Try choosing another role preset!</div>`;
                 return;
             }
 
             grid.innerHTML = leads.map((lead, idx) => {
-                const hrUrl = lead.hr_contact?.includes("http") ? lead.hr_contact.split("—")[1]?.trim() : (lead.contact_linkedin_url || "#");
-                const techUrl = lead.tech_contact?.includes("http") ? lead.tech_contact.split("—")[1]?.trim() : (lead.contact_linkedin_url || "#");
-                const ceoUrl = lead.ceo_contact?.includes("http") ? lead.ceo_contact.split("—")[1]?.trim() : (lead.contact_linkedin_url || "#");
+                const hrUrl = lead.hr_contact?.includes("http") ? lead.hr_contact.substring(lead.hr_contact.indexOf("http")) : "#";
+                const techUrl = lead.tech_contact?.includes("http") ? lead.tech_contact.substring(lead.tech_contact.indexOf("http")) : "#";
+                const ceoUrl = lead.ceo_contact?.includes("http") ? lead.ceo_contact.substring(lead.ceo_contact.indexOf("http")) : "#";
+
+                const hrName = lead.hr_contact ? lead.hr_contact.split("—")[0].split("http")[0].trim() : "Talent Acquisition";
+                const techName = lead.tech_contact ? lead.tech_contact.split("—")[0].split("http")[0].trim() : "Technical / Engineering Lead";
+                const ceoName = lead.ceo_contact ? lead.ceo_contact.split("—")[0].split("http")[0].trim() : "Founder / Executive Leadership";
 
                 return `
                 <div class="job-card" data-search="${(lead.company + ' ' + lead.role + ' ' + lead.location).toLowerCase()}">
@@ -556,9 +450,9 @@
                         <div class="card-top">
                             <div style="display:flex; gap:0.5rem; align-items:center;">
                                 <span class="badge" style="background:#1e293b; color:#fff;">#${idx+1}</span>
-                                <span class="badge badge-stipend">💰 ${lead.paid_source}</span>
+                                <span class="badge badge-stipend">💰 ${lead.paid_source || "Confirmed Paid"}</span>
                             </div>
-                            <span class="badge badge-loc">📍 ${lead.location}</span>
+                            <span class="badge badge-loc">📍 ${lead.location || "Hyderabad"}</span>
                         </div>
 
                         <div class="company-name">${lead.company}</div>
@@ -566,7 +460,7 @@
 
                         <div class="why-fits-box">
                             <strong style="color:#f59e0b; display:block; margin-bottom:0.25rem;">💡 Cold Outreach Strategy:</strong>
-                            ${lead.why_it_fits}
+                            ${lead.why_it_fits || "Reach out directly to the Engineering Lead with your project GitHub/portfolio to fast-track technical interview scheduling."}
                         </div>
 
                         <div class="contacts-section">
@@ -578,7 +472,7 @@
                             <div class="contact-row">
                                 <div class="contact-info">
                                     <div class="contact-role-tag highlight">💻 Tech / Engineering Lead (Top Match)</div>
-                                    <div class="contact-person">${lead.tech_contact ? lead.tech_contact.split("—")[0].trim() : (lead.contact_name || "Engineering Lead")}</div>
+                                    <div class="contact-person">${techName}</div>
                                 </div>
                                 <div class="contact-actions">
                                     <a href="${techUrl}" target="_blank" class="btn-link">Profile ↗</a>
@@ -590,7 +484,7 @@
                             <div class="contact-row">
                                 <div class="contact-info">
                                     <div class="contact-role-tag">👤 HR / Talent Acquisition</div>
-                                    <div class="contact-person">${lead.hr_contact ? lead.hr_contact.split("—")[0].trim() : "Talent Acquisition"}</div>
+                                    <div class="contact-person">${hrName}</div>
                                 </div>
                                 <div class="contact-actions">
                                     <a href="${hrUrl}" target="_blank" class="btn-link" style="background:#334155;">LinkedIn ↗</a>
@@ -602,7 +496,7 @@
                             <div class="contact-row">
                                 <div class="contact-info">
                                     <div class="contact-role-tag">👔 Founder / CEO</div>
-                                    <div class="contact-person">${lead.ceo_contact ? lead.ceo_contact.split("—")[0].trim() : (lead.contact_name || "Executive Leadership")}</div>
+                                    <div class="contact-person">${ceoName}</div>
                                 </div>
                                 <div class="contact-actions">
                                     <a href="${ceoUrl}" target="_blank" class="btn-link" style="background:#334155;">LinkedIn ↗</a>
@@ -612,7 +506,7 @@
                         </div>
                     </div>
 
-                    <a href="${lead.apply_link}" target="_blank" rel="noopener noreferrer" class="btn-apply-main">
+                    <a href="${lead.apply_link || '#'}" target="_blank" rel="noopener noreferrer" class="btn-apply-main">
                         🚀 Direct Application Portal Link
                     </a>
                 </div>
