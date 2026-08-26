@@ -51,7 +51,7 @@ def get_api_key(client_key: str = None) -> str:
     except Exception:
         return ""
 
-def query_openrouter(role: str, location: str, job_type: str, client_key: str = None) -> list:
+def query_openrouter(role: str, location: str, job_type: str, compensation: str = "Any", client_key: str = None) -> list:
     api_key = get_api_key(client_key)
     models_to_try = [
         "meta-llama/llama-3.1-8b-instruct",
@@ -59,7 +59,8 @@ def query_openrouter(role: str, location: str, job_type: str, client_key: str = 
         "qwen/qwen-2.5-72b-instruct"
     ]
 
-    prompt = f"Find 6 REAL, distinct companies with active or recent {job_type} and job openings for '{role}' in '{location}, India'. Provide real career links and direct LinkedIn contacts for HR, Technical Lead, and CEO in JSON format."
+    comp_clause = f"with compensation range around '{compensation}'" if compensation and compensation != "Any" else "with verified compensation"
+    prompt = f"Find 6 REAL, distinct companies with active or recent {job_type} and job openings for '{role}' in '{location}, India' {comp_clause}. Provide real career links and direct LinkedIn contacts for HR, Technical Lead, and CEO in JSON format."
 
     for model in models_to_try:
         try:
@@ -134,9 +135,10 @@ class handler(BaseHTTPRequestHandler):
         role = req.get("role", "PCB Design Engineer Intern")
         location = req.get("location", "Hyderabad")
         job_type = req.get("job_type", "Internship")
+        compensation = req.get("compensation", "Any")
         client_key = req.get("api_key")
 
-        leads = query_openrouter(role, location, job_type, client_key)
+        leads = query_openrouter(role, location, job_type, compensation, client_key)
         self._send_json(200, {
             "success": True,
             "leads": leads,
