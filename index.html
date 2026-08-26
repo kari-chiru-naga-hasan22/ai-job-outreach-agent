@@ -252,14 +252,14 @@
         <section class="glass-panel">
             <form id="searchForm" class="form-grid">
                 <div class="col-span-5">
-                    <label>Role / Discipline (Type Any Role)</label>
-                    <input type="text" id="roleInput" value="PCB Design Engineer Intern" placeholder="e.g. PCB Design Intern, Embedded Software, VLSI, AI Engineer" required>
+                    <label>Role / Discipline</label>
+                    <input type="text" id="roleInput" value="" placeholder="" required>
                     <div class="preset-pills" id="presetPills"></div>
                 </div>
 
                 <div class="col-span-3">
                     <label>Location</label>
-                    <input type="text" id="locationInput" value="Hyderabad" placeholder="Hyderabad">
+                    <input type="text" id="locationInput" value="" placeholder="">
                     <div class="preset-pills">
                         <button type="button" class="pill-btn" onclick="setCity('Hyderabad')">Hyderabad</button>
                         <button type="button" class="pill-btn" onclick="setCity('Bengaluru')">Bengaluru</button>
@@ -303,11 +303,17 @@
                 <h2 style="font-size:1.35rem; font-weight:800;" id="resultsTitle">Live Real-Time Opportunities</h2>
                 <span class="results-count" id="resultsCount">Ready to scout</span>
             </div>
-            <input type="text" id="filterInput" class="filter-input" placeholder="🔍 Filter by company or skill..." onkeyup="filterLeads()">
+            <input type="text" id="filterInput" class="filter-input" placeholder="" onkeyup="filterLeads()">
         </div>
 
         <!-- Job Cards Grid -->
-        <div class="jobs-grid" id="jobsGrid"></div>
+        <div class="jobs-grid" id="jobsGrid">
+            <div style="grid-column:1/-1; text-align:center; padding:4rem 1.5rem; color:var(--text-muted); background:var(--surface); border:1px dashed var(--border); border-radius:16px;">
+                <div style="font-size:2.5rem; margin-bottom:0.75rem;">🎯</div>
+                <h3 style="color:#fff; font-size:1.2rem; font-weight:700; margin-bottom:0.4rem;">Ready to Scout Opportunities</h3>
+                <p style="font-size:0.9rem;">Type any job title or internship domain above and click <strong>Search Real Opportunities</strong> to scout verified live listings.</p>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -392,8 +398,9 @@
         function renderPresets() {
             const domain = DOMAINS.find(d => d.id === currentDomain);
             const pillsEl = document.getElementById("presetPills");
+            const currVal = document.getElementById('roleInput').value;
             pillsEl.innerHTML = domain.presets.map(p => `
-                <button type="button" class="pill-btn ${document.getElementById('roleInput').value === p ? 'active' : ''}" onclick="setRole('${p}')">
+                <button type="button" class="pill-btn ${currVal === p ? 'active' : ''}" onclick="setRole('${p}')">
                     ${p}
                 </button>
             `).join('');
@@ -415,7 +422,9 @@
 
         function setCity(c) {
             document.getElementById("locationInput").value = c;
-            performSearch();
+            if (document.getElementById("roleInput").value.trim()) {
+                performSearch();
+            }
         }
 
         function showToast(text) {
@@ -489,8 +498,15 @@ Output STRICTLY valid JSON:
         }
 
         async function performSearch() {
-            const role = document.getElementById("roleInput").value;
-            const location = document.getElementById("locationInput").value || "Hyderabad";
+            const roleInput = document.getElementById("roleInput");
+            const role = roleInput.value.trim();
+            if (!role) {
+                showToast("⚠️ Please enter a job or internship title!");
+                roleInput.focus();
+                return;
+            }
+
+            const location = document.getElementById("locationInput").value.trim() || "India";
             const jobType = document.getElementById("typeSelect").value;
             const compensation = document.getElementById("compSelect").value;
             const btn = document.getElementById("searchBtn");
@@ -674,9 +690,8 @@ Output STRICTLY valid JSON:
             performSearch();
         });
 
-        // Initialize on page load
+        // Initialize on page load without auto-searching
         initTabs();
-        performSearch();
     </script>
 </body>
 </html>
