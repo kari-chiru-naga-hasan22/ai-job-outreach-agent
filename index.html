@@ -323,6 +323,35 @@
         let currentDomain = "pcb";
         let allLeads = [];
 
+        function parseContact(val, defaultTitle) {
+            if (!val) return { name: defaultTitle, url: "https://www.linkedin.com" };
+            if (typeof val === "object" && !Array.isArray(val)) {
+                const name = val.name || val.person || val.contact || val.title || defaultTitle;
+                const url = val.linkedin || val.url || val.link || val.profile || "";
+                return {
+                    name: String(name).replace(/[—\-\s:,\(]+$/, "").trim() || defaultTitle,
+                    url: url ? String(url).trim() : `https://www.linkedin.com/search/results/people/?keywords=${encodeURIComponent(name)}`
+                };
+            }
+            if (Array.isArray(val)) {
+                return parseContact(val.join(" "), defaultTitle);
+            }
+            const str = String(val).trim();
+            if (str.includes("http")) {
+                const idx = str.indexOf("http");
+                const namePart = str.substring(0, idx).replace(/[—\-\s:,\(]+$/, "").trim();
+                const urlPart = str.substring(idx).replace(/[\)\s,]+$/, "").trim();
+                return {
+                    name: namePart || defaultTitle,
+                    url: urlPart || "https://www.linkedin.com"
+                };
+            }
+            return {
+                name: str || defaultTitle,
+                url: `https://www.linkedin.com/search/results/people/?keywords=${encodeURIComponent(str)}`
+            };
+        }
+
         function initTabs() {
             const tabsEl = document.getElementById("domainTabs");
             tabsEl.innerHTML = DOMAINS.map(d => `
@@ -509,39 +538,43 @@ Output STRICTLY valid JSON:
 
         function renderLeads(leads) {
             const grid = document.getElementById("jobsGrid");
-            document.getElementById("resultsCount").innerText = `${leads.length} Real Openings Found`;
-
-            if (!leads || leads.length === 0) {
+            if (!leads || !Array.isArray(leads) || leads.length === 0) {
                 grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:3rem; color:var(--text-muted);">No matching listings found. Try choosing another role preset!</div>`;
+                document.getElementById("resultsCount").innerText = "0 Openings";
                 return;
             }
 
-            grid.innerHTML = leads.map((lead, idx) => {
-                const hrUrl = lead.hr_contact?.includes("http") ? lead.hr_contact.substring(lead.hr_contact.indexOf("http")) : "#";
-                const techUrl = lead.tech_contact?.includes("http") ? lead.tech_contact.substring(lead.tech_contact.indexOf("http")) : "#";
-                const ceoUrl = lead.ceo_contact?.includes("http") ? lead.ceo_contact.substring(lead.ceo_contact.indexOf("http")) : "#";
+            document.getElementById("resultsCount").innerText = `${leads.length} Real Openings Found`;
 
-                const hrName = lead.hr_contact ? lead.hr_contact.split("—")[0].split("http")[0].trim() : "Talent Acquisition";
-                const techName = lead.tech_contact ? lead.tech_contact.split("—")[0].split("http")[0].trim() : "Technical / Engineering Lead";
-                const ceoName = lead.ceo_contact ? lead.ceo_contact.split("—")[0].split("http")[0].trim() : "Founder / Executive Leadership";
+            grid.innerHTML = leads.map((lead, idx) => {
+                const hr = parseContact(lead.hr_contact, "Talent Acquisition");
+                const tech = parseContact(lead.tech_contact, "Technical / Engineering Lead");
+                const ceo = parseContact(lead.ceo_contact, "Founder / Executive Leadership");
+
+                const company = String(lead.company || "Hiring Company");
+                const role = String(lead.role || "Engineering Opening");
+                const location = String(lead.location || "Hyderabad, India");
+                const paid = String(lead.paid_source || "Confirmed Paid");
+                const whyFits = String(lead.why_it_fits || "Reach out directly to the Engineering Lead with your project GitHub/portfolio to fast-track technical interview scheduling.");
+                const applyLink = lead.apply_link && String(lead.apply_link).startsWith("http") ? String(lead.apply_link) : `https://www.google.com/search?q=${encodeURIComponent(company + ' careers ' + role)}`;
 
                 return `
-                <div class="job-card" data-search="${(lead.company + ' ' + lead.role + ' ' + lead.location).toLowerCase()}">
+                <div class="job-card" data-search="${(company + ' ' + role + ' ' + location).toLowerCase()}">
                     <div>
                         <div class="card-top">
                             <div style="display:flex; gap:0.5rem; align-items:center;">
                                 <span class="badge" style="background:#1e293b; color:#fff;">#${idx+1}</span>
-                                <span class="badge badge-stipend">💰 ${lead.paid_source || "Confirmed Paid"}</span>
+                                <span class="badge badge-stipend">💰 ${paid}</span>
                             </div>
-                            <span class="badge badge-loc">📍 ${lead.location || "Hyderabad"}</span>
+                            <span class="badge badge-loc">📍 ${location}</span>
                         </div>
 
-                        <div class="company-name">${lead.company}</div>
-                        <div class="role-name">${lead.role}</div>
+                        <div class="company-name">${company}</div>
+                        <div class="role-name">${role}</div>
 
                         <div class="why-fits-box">
                             <strong style="color:#f59e0b; display:block; margin-bottom:0.25rem;">💡 Cold Outreach Strategy:</strong>
-                            ${lead.why_it_fits || "Reach out directly to the Engineering Lead with your project GitHub/portfolio to fast-track technical interview scheduling."}
+                            ${whyFits}
                         </div>
 
                         <div class="contacts-section">
@@ -553,11 +586,11 @@ Output STRICTLY valid JSON:
                             <div class="contact-row">
                                 <div class="contact-info">
                                     <div class="contact-role-tag highlight">💻 Tech / Engineering Lead (Top Match)</div>
-                                    <div class="contact-person">${techName}</div>
+                                    <div class="contact-person">${tech.name}</div>
                                 </div>
                                 <div class="contact-actions">
-                                    <a href="${techUrl}" target="_blank" class="btn-link">Profile ↗</a>
-                                    <button type="button" class="btn-copy" onclick="copyPitch('tech', '${lead.company}', '${lead.role}')">Copy Pitch</button>
+                                    <a href="${tech.url}" target="_blank" rel="noopener noreferrer" class="btn-link">Profile ↗</a>
+                                    <button type="button" class="btn-copy" onclick="copyPitch('tech', '${company.replace(/'/g, "\\'")}', '${role.replace(/'/g, "\\'")}')">Copy Pitch</button>
                                 </div>
                             </div>
 
@@ -565,11 +598,11 @@ Output STRICTLY valid JSON:
                             <div class="contact-row">
                                 <div class="contact-info">
                                     <div class="contact-role-tag">👤 HR / Talent Acquisition</div>
-                                    <div class="contact-person">${hrName}</div>
+                                    <div class="contact-person">${hr.name}</div>
                                 </div>
                                 <div class="contact-actions">
-                                    <a href="${hrUrl}" target="_blank" class="btn-link" style="background:#334155;">LinkedIn ↗</a>
-                                    <button type="button" class="btn-copy" onclick="copyPitch('hr', '${lead.company}', '${lead.role}')">Copy Pitch</button>
+                                    <a href="${hr.url}" target="_blank" rel="noopener noreferrer" class="btn-link" style="background:#334155;">LinkedIn ↗</a>
+                                    <button type="button" class="btn-copy" onclick="copyPitch('hr', '${company.replace(/'/g, "\\'")}', '${role.replace(/'/g, "\\'")}')">Copy Pitch</button>
                                 </div>
                             </div>
 
@@ -577,17 +610,17 @@ Output STRICTLY valid JSON:
                             <div class="contact-row">
                                 <div class="contact-info">
                                     <div class="contact-role-tag">👔 Founder / CEO</div>
-                                    <div class="contact-person">${ceoName}</div>
+                                    <div class="contact-person">${ceo.name}</div>
                                 </div>
                                 <div class="contact-actions">
-                                    <a href="${ceoUrl}" target="_blank" class="btn-link" style="background:#334155;">LinkedIn ↗</a>
-                                    <button type="button" class="btn-copy" onclick="copyPitch('ceo', '${lead.company}', '${lead.role}')">Copy Pitch</button>
+                                    <a href="${ceo.url}" target="_blank" rel="noopener noreferrer" class="btn-link" style="background:#334155;">LinkedIn ↗</a>
+                                    <button type="button" class="btn-copy" onclick="copyPitch('ceo', '${company.replace(/'/g, "\\'")}', '${role.replace(/'/g, "\\'")}')">Copy Pitch</button>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <a href="${lead.apply_link || '#'}" target="_blank" rel="noopener noreferrer" class="btn-apply-main">
+                    <a href="${applyLink}" target="_blank" rel="noopener noreferrer" class="btn-apply-main">
                         🚀 Direct Application Portal Link
                     </a>
                 </div>
