@@ -1,0 +1,20 @@
+{
+  "job_title": "Embedded Systems Engineer Intern",
+  "job_variants": [
+    "Firmware Engineer",
+    "PCB Design Engineer",
+    "Hardware Design Intern",
+    "AI Engineer Intern",
+    "VLSI Intern"
+  ],
+  "location": "Hyderabad",
+  "job_type": "internship",
+  "paid_only": true,
+  "minimum_stipend_inr": 10000,
+  "max_leads_per_run": 15,
+  "telegram": {
+    "bot_token": "YOUR_BOT_TOKEN_HERE",
+    "chat_id": "YOUR_CHAT_ID_HERE",
+    "enabled": true
+  }
+}
