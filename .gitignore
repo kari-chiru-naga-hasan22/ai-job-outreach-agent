@@ -1,0 +1,11 @@
+.env
+__pycache__/
+*.pyc
+*.zip
+*.log
+test_*.py
+*push*.json
+batch_*.json
+p_batch*.json
+files_payload.json
+core_payload.json
