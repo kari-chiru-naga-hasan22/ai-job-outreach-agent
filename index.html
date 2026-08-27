@@ -532,15 +532,60 @@
         let currentDomain = "pcb";
         let allLeads = [];
 
+        const COMPANY_DOMAINS = {
+            "moschip": "moschip.com",
+            "medha": "medha.com",
+            "cyient": "cyient.com",
+            "skyroot": "skyroot.in",
+            "dhruva": "dhruvaspace.com",
+            "highradius": "highradius.com",
+            "darwinbox": "darwinbox.com",
+            "observe": "observe.ai",
+            "cognida": "cognida.ai",
+            "stackular": "stackular.com",
+            "tapza": "tapza.in",
+            "techolution": "techolution.com",
+            "scitech": "patent-art.com",
+            "adosx": "adosx.com",
+            "gyannidhi": "gyannidhi.in",
+            "sarvam": "sarvam.ai",
+            "krutrim": "olakrutrim.com",
+            "hyperverge": "hyperverge.co",
+            "corover": "corover.ai",
+            "yellow": "yellow.ai",
+            "incore": "incoresemi.com",
+            "tessolve": "tessolve.com",
+            "mistral": "mistralsolutions.com",
+            "qualcomm": "qualcomm.com",
+            "texas": "ti.com",
+            "centum": "centumelectronics.com",
+            "kaynes": "kaynestechnology.net"
+        };
+
+        function getCompanyDomain(company) {
+            const lower = company.toLowerCase();
+            for (const [k, domain] of Object.entries(COMPANY_DOMAINS)) {
+                if (lower.includes(k)) return domain;
+            }
+            const clean = lower
+                .replace(/technologies|technology|solutions|semiconductors|semiconductor|aerospace|limited|pvt|ltd|inc|private|services|innovations|drives|space|ai/gi, '')
+                .replace(/[^a-z0-9]/g, '');
+            return clean ? `${clean}.com` : 'linkedin.com';
+        }
+
         function getCompanySlug(company) {
-            return company.toLowerCase()
+            const lower = company.toLowerCase();
+            for (const [k, domain] of Object.entries(COMPANY_DOMAINS)) {
+                if (lower.includes(k)) return domain.split('.')[0];
+            }
+            return lower
                 .replace(/technologies|solutions|analytics|limited|pvt|ltd|india|services/gi, '')
                 .replace(/[^a-z0-9]/g, '') || 'company';
         }
 
         function getCompanyLogo(company) {
-            const clean = company.toLowerCase().replace(/[^a-z0-9]/g, '');
-            return `https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://${clean}.com&size=64`;
+            const domain = getCompanyDomain(company);
+            return `https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://${domain}&size=64`;
         }
 
         function parseContact(val, defaultTitle, company) {
