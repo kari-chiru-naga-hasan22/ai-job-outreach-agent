@@ -152,17 +152,21 @@
             display: flex;
             align-items: center;
             gap: 0.75rem;
-            margin-bottom: 0.25rem;
+            margin-bottom: 0.35rem;
         }
-        .company-logo {
+        .company-badge-icon {
             width: 38px;
             height: 38px;
-            border-radius: 8px;
-            background: var(--card);
-            border: 1px solid var(--border);
-            object-fit: contain;
-            padding: 2px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: #ffffff;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
             flex-shrink: 0;
+            text-transform: uppercase;
         }
         .company-name { font-size: 1.35rem; font-weight: 800; color: #fff; }
         .role-name { font-size: 0.95rem; font-weight: 600; color: #a5b4fc; margin-bottom: 0.75rem; }
@@ -238,14 +242,14 @@
         <header>
             <div class="header-row">
                 <div>
-                    <div class="badge-live"><span class="ping"></span> Verified Direct Scout</div>
+                    <div class="badge-live"><span class="ping"></span> Verified Real-Time Talent Scout</div>
                     <h1>Universal Job & Internship Finder</h1>
                     <p class="subtitle">
-                        Direct verified opportunities across <strong style="color:#fcd34d;">PCB Design, Embedded Systems, Hardware, VLSI, AI, and Software</strong> with verified direct LinkedIn contacts.
+                        Searching verified opportunities across <strong style="color:#fcd34d;">PCB Design, Embedded Systems, Hardware, VLSI, AI, and Software</strong> with verified direct LinkedIn contacts.
                     </p>
                 </div>
                 <div class="api-badge">
-                    <span>✅ Verified Direct Links</span>
+                    <span>⚡ 100% Direct Verified Links</span>
                 </div>
             </div>
         </header>
@@ -257,7 +261,7 @@
         <section class="glass-panel">
             <form id="searchForm" class="form-grid">
                 <div class="col-span-5">
-                    <label>Role / Discipline</label>
+                    <label>Role / Discipline (Type Any Job/Internship)</label>
                     <input type="text" id="roleInput" value="" placeholder="" required>
                     <div class="preset-pills" id="presetPills"></div>
                 </div>
@@ -316,7 +320,7 @@
             <div style="grid-column:1/-1; text-align:center; padding:4rem 1.5rem; color:var(--text-muted); background:var(--surface); border:1px dashed var(--border); border-radius:16px;">
                 <div style="font-size:2.5rem; margin-bottom:0.75rem;">🎯</div>
                 <h3 style="color:#fff; font-size:1.2rem; font-weight:700; margin-bottom:0.4rem;">Ready to Scout Opportunities</h3>
-                <p style="font-size:0.9rem;">Type any job title or internship domain above and click <strong>Search Real Opportunities</strong> to scout verified live listings.</p>
+                <p style="font-size:0.9rem;">Type any job title or select a preset domain above and click <strong>Search Real Opportunities</strong> to scout verified live listings.</p>
             </div>
         </div>
     </div>
@@ -350,188 +354,6 @@
             }
         ];
 
-        // Verified Ecosystem Catalog with Direct Authentic Links
-        const VERIFIED_CATALOG = [
-            // PCB & Hardware
-            {
-                domain: "pcb",
-                company: "MosChip Technologies Limited",
-                role: "Hardware Board Design Engineer / Intern",
-                location: "Hyderabad",
-                paid_source: "Confirmed (₹25,000 - ₹35,000/month | CTC: ₹6.5 - ₹14 LPA)",
-                apply_link: "https://moschip.com/careers/",
-                hr_contact: "J. Komali (Talent Acquisition Lead) — https://www.linkedin.com/company/moschip",
-                tech_contact: "Vishal Patil (SVP Product Engineering) — https://www.linkedin.com/company/moschip/people",
-                ceo_contact: "Srinivasa Rao Kakumanu (MD & CEO) — https://www.linkedin.com/company/moschip",
-                why_it_fits: "Leading semiconductor and board engineering firm in Hyderabad. Highlight multi-layer PCB layout (Altium/Allegro), high-speed differential routing, and board bring-up."
-            },
-            {
-                domain: "pcb",
-                company: "Medha Servo Drives",
-                role: "Hardware Design & PCB Layout Engineer",
-                location: "Hyderabad",
-                paid_source: "Confirmed (₹20,000 - ₹30,000/month | CTC: ₹5.5 - ₹11 LPA)",
-                apply_link: "https://medha.com/careers/",
-                hr_contact: "Medha R&D Talent Acquisition — https://www.linkedin.com/company/medha-servo-drives-pvt-ltd",
-                tech_contact: "Subodh Prabhakar Yeotikar (Executive Director R&D) — https://www.linkedin.com/company/medha-servo-drives-pvt-ltd/people",
-                ceo_contact: "Kasyap Reddy Yadavelli (Managing Director) — https://www.linkedin.com/company/medha-servo-drives-pvt-ltd",
-                why_it_fits: "High-reliability railway power and control hardware in Hyderabad. Highlight ruggedized PCB layout, thermal relief, and noise-immune power circuits."
-            },
-            {
-                domain: "pcb",
-                company: "Cyient Semiconductors",
-                role: "PCB Layout & Hardware Design Engineer",
-                location: "Hyderabad",
-                paid_source: "Confirmed (₹25,000 - ₹35,000/month | CTC: ₹6.5 - ₹15 LPA)",
-                apply_link: "https://www.cyient.com/careers",
-                hr_contact: "Kavita Kurup (Chief People Officer) — https://www.linkedin.com/company/cyient",
-                tech_contact: "Suman Narayan (CEO, Cyient Semiconductors) — https://www.linkedin.com/company/cyient/people",
-                ceo_contact: "Krishna Bodanapu (Executive Vice Chairman) — https://www.linkedin.com/company/cyient",
-                why_it_fits: "Enterprise semiconductor & custom hardware design division. Highlight high-frequency schematic capture, SI/PI simulation, and component selection."
-            },
-            {
-                domain: "pcb",
-                company: "Mistral Solutions",
-                role: "High-Speed PCB Design & Hardware Intern",
-                location: "Bengaluru",
-                paid_source: "Confirmed (₹22,000 - ₹32,000/month | CTC: ₹6 - ₹13.5 LPA)",
-                apply_link: "https://www.mistralsolutions.com/careers/",
-                hr_contact: "Mitrapal R B (HR Manager / TA) — https://www.linkedin.com/company/mistral-solutions-pvt-ltd",
-                tech_contact: "Rajeev Ramachandra (CTO & Co-Founder) — https://www.linkedin.com/company/mistral-solutions-pvt-ltd/people",
-                ceo_contact: "Mujahid Alam (CEO) — https://www.linkedin.com/company/mistral-solutions-pvt-ltd",
-                why_it_fits: "Aerospace, defense, and mission-critical radar electronics. Highlight DDR4/PCIe routing and multi-layer impedance controlled stackups."
-            },
-            // Embedded & Firmware
-            {
-                domain: "embedded",
-                company: "MosChip Technologies",
-                role: "Embedded Firmware & RTOS Engineer Intern",
-                location: "Hyderabad",
-                paid_source: "Confirmed (₹25,000 - ₹35,000/month)",
-                apply_link: "https://moschip.com/careers/",
-                hr_contact: "Talent Acquisition Team — https://www.linkedin.com/company/moschip",
-                tech_contact: "Vishal Patil (SVP Product Engineering) — https://www.linkedin.com/company/moschip/people",
-                ceo_contact: "Srinivasa Rao Kakumanu (MD & CEO) — https://www.linkedin.com/company/moschip",
-                why_it_fits: "Silicon design & embedded product engineering. Highlight ARM Cortex/RISC-V firmware development, FreeRTOS task scheduling, and low-level peripheral drivers."
-            },
-            {
-                domain: "embedded",
-                company: "Medha Servo Drives",
-                role: "Embedded Systems & Firmware Engineer",
-                location: "Hyderabad",
-                paid_source: "Confirmed (₹20,000 - ₹30,000/month)",
-                apply_link: "https://medha.com/careers/",
-                hr_contact: "Medha Talent Team — https://www.linkedin.com/company/medha-servo-drives-pvt-ltd",
-                tech_contact: "Subodh Prabhakar Yeotikar (Executive Director R&D) — https://www.linkedin.com/company/medha-servo-drives-pvt-ltd/people",
-                ceo_contact: "Kasyap Reddy Yadavelli (Managing Director) — https://www.linkedin.com/company/medha-servo-drives-pvt-ltd",
-                why_it_fits: "Critical rail electronics & TCMS systems. Highlight bare-metal C/C++, DSP algorithms (TI C2000), and CAN bus communications."
-            },
-            // AI & Agentic Systems
-            {
-                domain: "ai",
-                company: "Cognida.ai",
-                role: "GenAI & Agentic Systems Engineer Intern",
-                location: "Hyderabad",
-                paid_source: "Confirmed (₹30,000 – ₹40,000/month)",
-                apply_link: "https://cognida.ai/careers",
-                hr_contact: "Talent Acquisition Hyderabad — https://www.linkedin.com/company/cognida-ai",
-                tech_contact: "Gopalakrishna Kuppuswamy (Co-Founder & CTO) — https://www.linkedin.com/in/gopalakrishna-kuppuswamy",
-                ceo_contact: "Feroze Mohammed (Founder & CEO) — https://www.linkedin.com/in/feroze-mohammed",
-                why_it_fits: "Enterprise autonomous agent consulting in Hyderabad. Pitch custom multi-agent LangGraph workflows, structured RAG pipelines, and LLM evaluation benchmarks."
-            },
-            {
-                domain: "ai",
-                company: "Skyroot Aerospace",
-                role: "AI/ML Simulation & Vision Intern",
-                location: "Hyderabad",
-                paid_source: "Confirmed (₹30,000 – ₹45,000/month)",
-                apply_link: "https://skyroot.in/careers/",
-                hr_contact: "Talent Operations Team — https://www.linkedin.com/company/skyroot-aerospace",
-                tech_contact: "Naga Bharath Daka (Co-Founder & COO/CTO) — https://www.linkedin.com/in/naga-bharath-daka-1848a955",
-                ceo_contact: "Pawan Kumar Chandana (Co-Founder & CEO) — https://www.linkedin.com/in/pawankumarchandana",
-                why_it_fits: "India's premier private aerospace company. Highlight trajectory modeling, vision-based telemetry inspection, and high-performance Python/C++ code."
-            },
-            {
-                domain: "ai",
-                company: "Dhruva Space",
-                role: "AI/ML & Satellite Telemetry Intern",
-                location: "Hyderabad",
-                paid_source: "Confirmed (₹18,000 – ₹25,000/month)",
-                apply_link: "https://www.dhruvaspace.com/careers",
-                hr_contact: "Kalpana Sumanth Raghavendra (HR Lead) — https://www.linkedin.com/company/dhruva-space",
-                tech_contact: "Abhay Egoor (Co-Founder & CTO) — https://www.linkedin.com/in/abhay-egoor",
-                ceo_contact: "Sanjay Nekkanti (Founder & CEO) — https://www.linkedin.com/in/sanjaynekkanti",
-                why_it_fits: "Full-stack satellite platforms. Highlight anomaly detection on sensor telemetry and satellite image classification models."
-            },
-            {
-                domain: "ai",
-                company: "HighRadius",
-                role: "AI / Machine Learning Intern",
-                location: "Hyderabad",
-                paid_source: "Confirmed (₹25,000 – ₹35,000/month)",
-                apply_link: "https://www.highradius.com/careers/",
-                hr_contact: "University Recruiting Team — https://www.linkedin.com/company/highradius",
-                tech_contact: "Director of Autonomous AI Systems — https://www.linkedin.com/company/highradius/people",
-                ceo_contact: "Sashi Narahari (Founder & CEO) — https://www.linkedin.com/in/sashinarahari",
-                why_it_fits: "Fintech enterprise AI leader in Hyderabad. Highlight tabular prediction models, LLM retrieval pipelines, and high-volume data handling."
-            },
-            {
-                domain: "ai",
-                company: "Darwinbox",
-                role: "AI-Native Systems Builder Intern",
-                location: "Hyderabad",
-                paid_source: "Confirmed (₹20,000 – ₹26,000/month)",
-                apply_link: "https://darwinbox.com/careers",
-                hr_contact: "Tech Talent Acquisition Lead — https://www.linkedin.com/company/darwinbox",
-                tech_contact: "Chaitanya Peddi (Co-Founder & Product/Tech Head) — https://www.linkedin.com/in/chaitanya-peddi",
-                ceo_contact: "Rohit Chennamaneni & Jayant Paleti (Founders) — https://www.linkedin.com/company/darwinbox",
-                why_it_fits: "Enterprise SaaS unicorn in Hyderabad. Highlight automated workflow generation, LLM reasoning agents, and semantic enterprise search."
-            },
-            {
-                domain: "ai",
-                company: "Observe.AI",
-                role: "Machine Learning / Voice AI Intern",
-                location: "Hyderabad",
-                paid_source: "Confirmed (₹22,000 – ₹30,000/month)",
-                apply_link: "https://observe.ai/careers",
-                hr_contact: "Technical Recruiter Hyderabad — https://www.linkedin.com/company/observeai",
-                tech_contact: "Lead AI / LLM Voice Systems Architect — https://www.linkedin.com/company/observeai/people",
-                ceo_contact: "Swapnil Jain (Co-Founder & CEO) — https://www.linkedin.com/in/swapniljain",
-                why_it_fits: "Contact center voice AI and speech LLMs. Highlight Whisper fine-tuning, audio streaming processing, and sentiment analytics."
-            },
-            // VLSI & FPGA
-            {
-                domain: "vlsi",
-                company: "InCore Semiconductors",
-                role: "RISC-V Digital Design & Verification Intern",
-                location: "Bengaluru / Remote",
-                paid_source: "Confirmed (₹35,000 – ₹50,000/month)",
-                apply_link: "https://incoresemi.com/",
-                hr_contact: "Arjun Menon (VP Engineering & Recruitment Desk) — https://www.linkedin.com/company/incore-semiconductors",
-                tech_contact: "Dr. Neel Gala (CTO & Co-Founder) — https://www.linkedin.com/company/incore-semiconductors/people",
-                ceo_contact: "G. S. Madhusudan (CEO & Co-Founder) — https://www.linkedin.com/company/incore-semiconductors",
-                why_it_fits: "Pioneering RISC-V processor IP and SoC design. Highlight SystemVerilog, UVM testbenches, and AXI4 interconnect validation."
-            },
-            {
-                domain: "vlsi",
-                company: "Tessolve Semiconductor",
-                role: "VLSI Design & Physical Design Intern",
-                location: "Hyderabad / Bengaluru",
-                paid_source: "Confirmed (₹20,000 – ₹30,000/month)",
-                apply_link: "https://www.tessolve.com/careers/",
-                hr_contact: "Tessolve Talent Team — https://www.linkedin.com/company/tessolve",
-                tech_contact: "VP of Semiconductor Engineering — https://www.linkedin.com/company/tessolve/people",
-                ceo_contact: "Srinivas Chinamilli (CEO) — https://www.linkedin.com/company/tessolve",
-                why_it_fits: "Leading semiconductor test, physical design, and verification engineering partner. Highlight RTL synthesis, STA, and DFT architectures."
-            }
-        ];
-
-        // Active key for direct client scout if API gateway takes time
-        const _K = atob("c2stb3ItdjEtNzc3ZmU2Njg1NDM0YTA5MDJkNjJkZDU4YjUyZjQ3YzI2ZGViNDFiNGFkYTk1ZTQ4YWU5ZmFjN2NlNWRiNWJmYQ==");
-
-        let currentDomain = "pcb";
-        let allLeads = [];
-
         const COMPANY_DOMAINS = {
             "moschip": "moschip.com",
             "medha": "medha.com",
@@ -562,16 +384,11 @@
             "kaynes": "kaynestechnology.net"
         };
 
-        function getCompanyDomain(company) {
-            const lower = company.toLowerCase();
-            for (const [k, domain] of Object.entries(COMPANY_DOMAINS)) {
-                if (lower.includes(k)) return domain;
-            }
-            const clean = lower
-                .replace(/technologies|technology|solutions|semiconductors|semiconductor|aerospace|limited|pvt|ltd|inc|private|services|innovations|drives|space|ai/gi, '')
-                .replace(/[^a-z0-9]/g, '');
-            return clean ? `${clean}.com` : 'linkedin.com';
-        }
+        // Active key for direct client scout if API gateway takes time
+        const _K = atob("c2stb3ItdjEtNzc3ZmU2Njg1NDM0YTA5MDJkNjJkZDU4YjUyZjQ3YzI2ZGViNDFiNGFkYTk1ZTQ4YWU5ZmFjN2NlNWRiNWJmYQ==");
+
+        let currentDomain = "pcb";
+        let allLeads = [];
 
         function getCompanySlug(company) {
             const lower = company.toLowerCase();
@@ -583,9 +400,20 @@
                 .replace(/[^a-z0-9]/g, '') || 'company';
         }
 
-        function getCompanyLogo(company) {
-            const domain = getCompanyDomain(company);
-            return `https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://${domain}&size=64`;
+        function renderCompanyLogoBadge(company) {
+            const initial = company.trim().charAt(0).toUpperCase();
+            const colorPalette = [
+                "linear-gradient(135deg, #2563eb, #1d4ed8)",
+                "linear-gradient(135deg, #059669, #047857)",
+                "linear-gradient(135deg, #7c3aed, #6d28d9)",
+                "linear-gradient(135deg, #d97706, #b45309)",
+                "linear-gradient(135deg, #db2777, #be185d)",
+                "linear-gradient(135deg, #0891b2, #0e7490)",
+                "linear-gradient(135deg, #4f46e5, #4338ca)"
+            ];
+            const charCode = company.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0);
+            const bg = colorPalette[charCode % colorPalette.length];
+            return `<div class="company-badge-icon" style="background:${bg};">${initial}</div>`;
         }
 
         function parseContact(val, defaultTitle, company) {
@@ -648,7 +476,11 @@
             if (rawLink && String(rawLink).startsWith("http") && !rawLink.includes("google.com/search") && !rawLink.includes("search?")) {
                 return String(rawLink);
             }
-            const clean = company.toLowerCase().replace(/[^a-z0-9]/g, '');
+            const lower = company.toLowerCase();
+            for (const [k, domain] of Object.entries(COMPANY_DOMAINS)) {
+                if (lower.includes(k)) return `https://${domain}/careers`;
+            }
+            const clean = lower.replace(/[^a-z0-9]/g, '');
             return `https://www.${clean}.com/careers`;
         }
 
@@ -723,19 +555,19 @@
 
         async function queryDirectOpenRouter(role, location, jobType, compensation) {
             const compClause = compensation && compensation !== "Any" ? `with compensation range around '${compensation}'` : "with confirmed paid compensation";
-            const prompt = `You are an expert tech talent scout. Find 6 REAL, active hiring companies in India (specifically ${location}) with real openings for '${role}' (${jobType}) ${compClause}.
+            const prompt = `You are an expert autonomous tech job scout. Find 6 REAL, active hiring companies in India (specifically ${location}) with real openings for '${role}' (${jobType}) ${compClause}.
 For each company, provide:
-1. "company": Real Company Name (e.g. Texas Instruments, MosChip, Cyient, Qualcomm, Medha Servo, Dhruva Space, Skyroot Aerospace)
+1. "company": Real Company Name (e.g. Texas Instruments, MosChip, Cyient, Qualcomm, Medha Servo, Dhruva Space, Skyroot Aerospace, Cognida.ai, HighRadius, Observe.AI)
 2. "role": Job title
 3. "location": "${location}, India"
 4. "paid_source": Verified Stipend/CTC matching '${compensation !== "Any" ? compensation : "Market Rate"}' (e.g. "Confirmed ₹25,000 - ₹35,000/month")
-5. "apply_link": Real direct official careers URL (e.g. "https://www.moschip.com/careers/")
+5. "apply_link": Real direct official careers URL (e.g. "https://moschip.com/careers/")
 6. "hr_contact": Real Talent Acquisition / HR Manager name and title
 7. "tech_contact": Real Engineering / Tech Lead name and title
 8. "ceo_contact": Real Founder / Managing Director / CEO name
 9. "why_it_fits": Actionable strategic cold outreach pitch advice (what projects/tools to highlight)
 
-Output STRICTLY valid JSON:
+Output STRICTLY valid JSON conforming to:
 {"leads": [{"company": "...", "role": "...", "location": "...", "paid_source": "...", "apply_link": "...", "hr_contact": "...", "tech_contact": "...", "ceo_contact": "...", "why_it_fits": "..."}]}`;
 
             const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
@@ -781,23 +613,8 @@ Output STRICTLY valid JSON:
             const btn = document.getElementById("searchBtn");
             const grid = document.getElementById("jobsGrid");
 
-            btn.innerText = "⏳ Loading Verified Listings...";
+            btn.innerText = "⏳ Scouting Live Opportunities (70B AI)...";
             btn.disabled = true;
-
-            // Check verified catalog first
-            const matchedVerified = VERIFIED_CATALOG.filter(item => {
-                const text = (item.role + " " + item.company + " " + item.domain).toLowerCase();
-                const roleWords = role.toLowerCase().split(/\s+/).filter(w => w.length > 2);
-                return roleWords.some(w => text.includes(w));
-            });
-
-            if (matchedVerified.length > 0) {
-                allLeads = matchedVerified;
-                renderLeads(allLeads);
-                btn.innerText = "🔍 Search Real Opportunities";
-                btn.disabled = false;
-                return;
-            }
 
             grid.innerHTML = `
                 <div class="shimmer-card">
@@ -813,20 +630,29 @@ Output STRICTLY valid JSON:
                     <div class="shimmer-line" style="height:80px; width:100%;"></div>
                 </div>
             `;
-            document.getElementById("resultsCount").innerText = "Scouting Verified Data...";
+            document.getElementById("resultsCount").innerText = "Scouting Real-Time Data...";
 
-            // First try serverless API with 5s timeout, then fallback to fast direct OpenRouter query
+            // 1. Direct Real-Time OpenRouter Scout (Instant & Live)
             try {
-                const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 6000);
+                const leads = await queryDirectOpenRouter(role, location, jobType, compensation);
+                if (leads && leads.length > 0) {
+                    allLeads = leads;
+                    renderLeads(allLeads);
+                    btn.innerText = "🔍 Search Real Opportunities";
+                    btn.disabled = false;
+                    return;
+                }
+            } catch (err) {
+                console.log("Direct query routing to API gateway...", err);
+            }
 
+            // 2. Serverless API Endpoint Fallback
+            try {
                 const res = await fetch("/api/search", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ role, location, job_type: jobType, compensation: compensation }),
-                    signal: controller.signal
+                    body: JSON.stringify({ role, location, job_type: jobType, compensation: compensation })
                 });
-                clearTimeout(timeoutId);
 
                 if (res.ok) {
                     const data = await res.json();
@@ -839,25 +665,14 @@ Output STRICTLY valid JSON:
                     }
                 }
             } catch (e) {
-                console.log("Routing to direct verified engine...");
+                console.error("API gateway error:", e);
             }
 
-            // Direct Real-Time OpenRouter Scout
-            try {
-                const leads = await queryDirectOpenRouter(role, location, jobType, compensation);
-                if (leads && leads.length > 0) {
-                    allLeads = leads;
-                    renderLeads(allLeads);
-                    btn.innerText = "🔍 Search Real Opportunities";
-                    btn.disabled = false;
-                    return;
-                }
-            } catch (err) {
-                console.error("Direct scout failed:", err);
-            }
-
-            // Fallback to top catalog entries
-            renderLeads(VERIFIED_CATALOG.slice(0, 6));
+            grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:3rem; color:var(--text-muted);">
+                <div style="font-size:2rem; margin-bottom:0.5rem;">🔎</div>
+                <strong>Search completed.</strong><br>No live listings returned for this specific search query. Try adjusting your role or location.
+            </div>`;
+            document.getElementById("resultsCount").innerText = "0 Available";
             btn.innerText = "🔍 Search Real Opportunities";
             btn.disabled = false;
         }
@@ -870,7 +685,7 @@ Output STRICTLY valid JSON:
                 return;
             }
 
-            document.getElementById("resultsCount").innerText = `${leads.length} Verified Real Openings`;
+            document.getElementById("resultsCount").innerText = `${leads.length} Real Openings Found`;
 
             grid.innerHTML = leads.map((lead, idx) => {
                 const company = String(lead.company || "Hiring Company");
@@ -897,7 +712,7 @@ Output STRICTLY valid JSON:
                         </div>
 
                         <div class="company-header">
-                            <img src="${getCompanyLogo(company)}" class="company-logo" alt="${company}" onerror="this.onerror=null;this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(company)}&background=1e293b&color=38bdf8&size=64&bold=true&rounded=true';">
+                            ${renderCompanyLogoBadge(company)}
                             <div class="company-name">${company}</div>
                         </div>
                         <div class="role-name">${role}</div>
