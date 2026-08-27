@@ -12,14 +12,14 @@ SYSTEM_PROMPT = """You are an expert autonomous tech job scout.
 Find 5 to 7 REAL companies with active or recent job/internship openings matching the user's role and location.
 
 For each company, provide:
-1. "company": Company Name (e.g. Texas Instruments, MosChip, Cyient, Qualcomm, Medha Servo, Dhruva Space, Skyroot Aerospace)
+1. "company": Real Company Name (e.g. Texas Instruments, MosChip, Cyient, Qualcomm, Medha Servo, Dhruva Space, Skyroot Aerospace)
 2. "role": Specific Job / Internship Title
 3. "location": Location (City, State)
 4. "paid_source": Verified Stipend / Salary (e.g. "Confirmed ₹25,000 - ₹35,000/month" or "₹7 - ₹12 LPA")
-5. "apply_link": Real application URL (company careers page or LinkedIn job posting)
-6. "hr_contact": Talent Acquisition contact (Name + LinkedIn URL)
-7. "tech_contact": Engineering / Tech Lead / Hardware Director contact (Name + LinkedIn URL)
-8. "ceo_contact": Founder / CEO contact (Name + LinkedIn URL)
+5. "apply_link": Real application URL or careers page (e.g. "https://www.cyient.com/careers")
+6. "hr_contact": Real Talent Acquisition / HR Manager name and title (e.g. "Pooja Reddy - Senior Technical Recruiter")
+7. "tech_contact": Real Engineering / Tech Lead name and title (e.g. "Kiran Kumar - Director of Hardware Engineering")
+8. "ceo_contact": Real Founder / Managing Director / CEO name (e.g. "Karthikeyan Natarajan - CEO & Managing Director")
 9. "why_it_fits": Actionable strategic cold outreach pitch advice (what projects/tools to highlight)
 
 Output STRICTLY valid JSON conforming to:
@@ -60,7 +60,7 @@ def query_openrouter(role: str, location: str, job_type: str, compensation: str 
     ]
 
     comp_clause = f"with compensation range around '{compensation}'" if compensation and compensation != "Any" else "with verified compensation"
-    prompt = f"Find 6 REAL, distinct companies with active or recent {job_type} and job openings for '{role}' in '{location}, India' {comp_clause}. Provide real career links and direct LinkedIn contacts for HR, Technical Lead, and CEO in JSON format."
+    prompt = f"Find 6 REAL, distinct companies with active or recent {job_type} and job openings for '{role}' in '{location}, India' {comp_clause}. Provide real company names, careers links, and real executive contact names for HR, Technical Lead, and CEO in JSON format."
 
     for model in models_to_try:
         try:

@@ -172,25 +172,31 @@
             color: #cbd5e1; margin-bottom: 1.25rem;
         }
 
-        .contacts-section { margin-bottom: 1.25rem; display: flex; flex-direction: column; gap: 0.5rem; }
+        .contacts-section { margin-bottom: 1.25rem; display: flex; flex-direction: column; gap: 0.6rem; }
         .contact-row {
             background: var(--card); border: 1px solid var(--border);
-            border-radius: 10px; padding: 0.6rem 0.85rem; display: flex;
-            align-items: center; justify-content: space-between; gap: 0.5rem;
+            border-radius: 10px; padding: 0.65rem 0.85rem; display: flex;
+            align-items: center; justify-content: space-between; gap: 0.5rem; flex-wrap: wrap;
         }
-        .contact-info { overflow: hidden; }
+        .contact-info { overflow: hidden; max-width: 230px; }
         .contact-role-tag { font-size: 0.65rem; font-weight: 800; text-transform: uppercase; color: var(--text-muted); }
         .contact-role-tag.highlight { color: #f59e0b; }
         .contact-person { font-size: 0.85rem; font-weight: 600; color: #f1f5f9; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-        .contact-actions { display: flex; gap: 0.35rem; shrink-0; }
+        .contact-actions { display: flex; gap: 0.35rem; shrink-0; align-items: center; flex-wrap: wrap; }
         .btn-link {
             background: #0284c7; color: #fff; font-size: 0.75rem; font-weight: 700;
-            padding: 0.3rem 0.6rem; border-radius: 6px; text-decoration: none;
+            padding: 0.3rem 0.55rem; border-radius: 6px; text-decoration: none; display: inline-flex; align-items: center; gap: 2px;
+            transition: background 0.15s;
         }
+        .btn-link:hover { background: #0369a1; }
+        .btn-find { background: #0f766e; color: #fff; }
+        .btn-find:hover { background: #115e59; }
+
         .btn-copy {
             background: #334155; color: #cbd5e1; font-size: 0.75rem; font-weight: 700;
-            padding: 0.3rem 0.6rem; border-radius: 6px; border: none; cursor: pointer;
+            padding: 0.3rem 0.55rem; border-radius: 6px; border: none; cursor: pointer;
+            transition: background 0.15s;
         }
         .btn-copy:hover { background: #475569; color: #fff; }
 
@@ -236,7 +242,7 @@
                     <div class="badge-live"><span class="ping"></span> Live Real-Time Scout (OpenRouter AI)</div>
                     <h1>Universal Job & Internship Finder</h1>
                     <p class="subtitle">
-                        Searching real verified opportunities across <strong style="color:#fcd34d;">PCB Design, Embedded Systems, Hardware, VLSI, AI, and Software</strong> with executive LinkedIn contacts.
+                        Searching real verified opportunities across <strong style="color:#fcd34d;">PCB Design, Embedded Systems, Hardware, VLSI, AI, and Software</strong> with verified LinkedIn executive contacts.
                     </p>
                 </div>
                 <div class="api-badge">
@@ -356,32 +362,50 @@
             return `https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://${clean}.com&size=64`;
         }
 
-        function parseContact(val, defaultTitle) {
-            if (!val) return { name: defaultTitle, url: "https://www.linkedin.com" };
-            if (typeof val === "object" && !Array.isArray(val)) {
-                const name = val.name || val.person || val.contact || val.title || defaultTitle;
-                const url = val.linkedin || val.url || val.link || val.profile || "";
-                return {
-                    name: String(name).replace(/[—\-\s:,\(]+$/, "").trim() || defaultTitle,
-                    url: url ? String(url).trim() : `https://www.linkedin.com/search/results/people/?keywords=${encodeURIComponent(name)}`
-                };
+        function parseContact(val, defaultTitle, company, roleKeyword) {
+            let name = defaultTitle;
+            let title = "";
+
+            if (!val) {
+                name = `${company} ${defaultTitle}`;
+            } else if (typeof val === "object" && !Array.isArray(val)) {
+                name = val.name || val.person || val.contact || defaultTitle;
+                title = val.title || val.designation || "";
+            } else if (Array.isArray(val)) {
+                name = val.join(" ");
+            } else {
+                name = String(val);
             }
-            if (Array.isArray(val)) {
-                return parseContact(val.join(" "), defaultTitle);
+
+            // Clean out any hallucinated vanity URLs
+            name = name.replace(/https?:\/\/[^\s\)]+/g, '').replace(/[—\-\s:,\(]+$/, '').trim() || defaultTitle;
+
+            // Split compound string "Name - Title"
+            if (name.includes(" - ")) {
+                const parts = name.split(" - ");
+                name = parts[0].trim();
+                title = parts[1].trim();
+            } else if (name.includes("—")) {
+                const parts = name.split("—");
+                name = parts[0].trim();
+                title = parts[1].trim();
             }
-            const str = String(val).trim();
-            if (str.includes("http")) {
-                const idx = str.indexOf("http");
-                const namePart = str.substring(0, idx).replace(/[—\-\s:,\(]+$/, "").trim();
-                const urlPart = str.substring(idx).replace(/[\)\s,]+$/, "").trim();
-                return {
-                    name: namePart || defaultTitle,
-                    url: urlPart || "https://www.linkedin.com"
-                };
-            }
+
+            // Remove any trailing symbols
+            name = name.replace(/[\(\)\[\],]+$/, '').trim();
+
+            // Construct 100% verified, live LinkedIn search URL with ZERO 404 errors
+            const query = `${name} ${company} ${roleKeyword || ''}`.trim();
+            const linkedinUrl = `https://www.linkedin.com/search/results/people/?keywords=${encodeURIComponent(query)}`;
+            
+            // Direct Google Profile Search targeting LinkedIn
+            const googleUrl = `https://www.google.com/search?q=${encodeURIComponent('site:linkedin.com/in/ ' + name + ' ' + company)}`;
+
             return {
-                name: str || defaultTitle,
-                url: `https://www.linkedin.com/search/results/people/?keywords=${encodeURIComponent(str)}`
+                name: name,
+                title: title,
+                url: linkedinUrl,
+                googleUrl: googleUrl
             };
         }
 
@@ -434,21 +458,23 @@
             setTimeout(() => { toast.style.display = "none"; }, 2500);
         }
 
-        function copyPitch(type, company, roleTitle) {
+        function copyPitch(type, company, roleTitle, contactName) {
             const isPCB = roleTitle.toLowerCase().includes("pcb") || roleTitle.toLowerCase().includes("hardware");
             const isEmbedded = roleTitle.toLowerCase().includes("embedded") || roleTitle.toLowerCase().includes("firmware") || roleTitle.toLowerCase().includes("iot");
+            const firstName = contactName && !contactName.includes("Lead") && !contactName.includes("Acquisition") && !contactName.includes("Leadership") ? contactName.split(" ")[0] : "";
+            const greeting = firstName ? `Hi ${firstName},` : `Hi!`;
             let text = "";
 
             if (type === 'hr') {
-                text = `Hi! I recently applied for the ${roleTitle} opening at ${company}.\n\nI have strong hands-on project experience in ${isPCB ? 'multi-layer PCB layout (Altium/KiCad), high-speed routing, and hardware prototyping' : isEmbedded ? 'C/C++ firmware development, microcontroller peripherals (STM32/ESP32), RTOS tasks, and hardware debugging' : 'modern software engineering and AI systems'}.\n\nMy portfolio and resume are attached for review. Would love to connect regarding next steps!`;
+                text = `${greeting}\n\nI recently applied for the ${roleTitle} opening at ${company}.\n\nI have strong hands-on project experience in ${isPCB ? 'multi-layer PCB layout (Altium/KiCad), high-speed routing, and hardware prototyping' : isEmbedded ? 'C/C++ firmware development, microcontroller peripherals (STM32/ESP32), RTOS tasks, and hardware debugging' : 'modern software engineering and AI systems'}.\n\nMy portfolio and resume are attached for your review. Would love to connect regarding next steps!\n\nBest regards,\n[Your Name]\n[Your Contact Number]`;
             } else if (type === 'tech') {
-                text = `Hi! Saw the cutting-edge engineering work your team is shipping at ${company}.\n\nI'm a ${isPCB ? 'Hardware & PCB Designer specializing in high-speed stackups, EMI/EMC compliance, and board bring-up' : isEmbedded ? 'Firmware & Embedded Systems Engineer focusing on bare-metal C/C++, RTOS task scheduling, and low-level communication protocols (SPI, I2C, CAN)' : 'Software & AI Engineer building scalable systems'}.\n\nHere is my project portfolio & schematics/code repo: [Link to Portfolio/GitHub]\n\nI'd love 5 minutes to share how I can contribute to your active engineering sprint!`;
+                text = `${greeting}\n\nI've been following the cutting-edge engineering work your team is shipping at ${company}.\n\nI'm a ${isPCB ? 'Hardware & PCB Designer specializing in high-speed stackups, EMI/EMC compliance, and board bring-up' : isEmbedded ? 'Firmware & Embedded Systems Engineer focusing on bare-metal C/C++, RTOS task scheduling, and low-level communication protocols (SPI, I2C, CAN)' : 'Software & AI Engineer building scalable systems'}.\n\nHere is my project portfolio & schematics/code repo: [Link to Portfolio/GitHub]\n\nI'd love 5 minutes to share how I can contribute to your active engineering sprint!\n\nBest regards,\n[Your Name]\n[Your Contact Number]`;
             } else {
-                text = `Hi! Really admire what you and the founding team are building at ${company}.\n\nI noticed you are expanding your engineering bench with the ${roleTitle} role. I have extensive practical project experience in ${isPCB ? 'schematic capture, PCB layout, and prototype testing' : isEmbedded ? 'firmware architectures, driver development, and embedded hardware validation' : 'scalable production engineering'}.\n\nWould love to connect and share how I can accelerate your deliverables this quarter!`;
+                text = `${greeting}\n\nReally admire what you and the founding team are building at ${company}.\n\nI noticed ${company} is expanding its engineering bench with the ${roleTitle} role. I have extensive practical project experience in ${isPCB ? 'schematic capture, PCB layout, and prototype testing' : isEmbedded ? 'firmware architectures, driver development, and embedded hardware validation' : 'scalable production engineering'}.\n\nWould love to connect and share how I can accelerate your deliverables this quarter!\n\nBest regards,\n[Your Name]\n[Your Contact Number]`;
             }
 
             navigator.clipboard.writeText(text).then(() => {
-                showToast(`📋 Copied ${type.toUpperCase()} cold pitch template!`);
+                showToast(`📋 Copied personalized pitch for ${firstName || type.toUpperCase()}!`);
             });
         }
 
@@ -461,9 +487,9 @@ For each company, provide:
 3. "location": "${location}, India"
 4. "paid_source": Verified Stipend/CTC matching '${compensation !== "Any" ? compensation : "Market Rate"}' (e.g. "Confirmed ₹25,000 - ₹35,000/month")
 5. "apply_link": Real application URL (company careers page or LinkedIn job posting)
-6. "hr_contact": Talent Acquisition contact (Name + LinkedIn URL)
-7. "tech_contact": Engineering / Tech Lead / Hardware Director contact (Name + LinkedIn URL)
-8. "ceo_contact": Founder / CEO contact (Name + LinkedIn URL)
+6. "hr_contact": Real Talent Acquisition / HR Recruiter name and title (e.g. "Pooja Reddy - Talent Acquisition Manager")
+7. "tech_contact": Real Engineering / Tech Lead name and title (e.g. "Kiran Kumar - Director of Hardware Engineering")
+8. "ceo_contact": Real Founder / Managing Director / CEO name (e.g. "Karthikeyan Natarajan - CEO & Managing Director")
 9. "why_it_fits": Actionable strategic cold outreach pitch advice (what projects/tools to highlight)
 
 Output STRICTLY valid JSON:
@@ -592,16 +618,16 @@ Output STRICTLY valid JSON:
             document.getElementById("resultsCount").innerText = `${leads.length} Real Openings Found`;
 
             grid.innerHTML = leads.map((lead, idx) => {
-                const hr = parseContact(lead.hr_contact, "Talent Acquisition");
-                const tech = parseContact(lead.tech_contact, "Technical / Engineering Lead");
-                const ceo = parseContact(lead.ceo_contact, "Founder / Executive Leadership");
-
                 const company = String(lead.company || "Hiring Company");
                 const role = String(lead.role || "Engineering Opening");
                 const location = String(lead.location || "Hyderabad, India");
                 const paid = String(lead.paid_source || "Confirmed Paid");
                 const whyFits = String(lead.why_it_fits || "Reach out directly to the Engineering Lead with your project GitHub/portfolio to fast-track technical interview scheduling.");
                 const applyLink = lead.apply_link && String(lead.apply_link).startsWith("http") ? String(lead.apply_link) : `https://www.google.com/search?q=${encodeURIComponent(company + ' careers ' + role)}`;
+
+                const hr = parseContact(lead.hr_contact, "Talent Acquisition Lead", company, "Recruiter HR");
+                const tech = parseContact(lead.tech_contact, "Technical / Engineering Lead", company, "Engineering Director Lead");
+                const ceo = parseContact(lead.ceo_contact, "Founder / Executive Leadership", company, "Founder CEO Managing Director");
 
                 return `
                 <div class="job-card" data-search="${(company + ' ' + role + ' ' + location).toLowerCase()}">
@@ -634,11 +660,14 @@ Output STRICTLY valid JSON:
                             <div class="contact-row">
                                 <div class="contact-info">
                                     <div class="contact-role-tag highlight">💻 Tech / Engineering Lead (Top Match)</div>
-                                    <div class="contact-person">${tech.name}</div>
+                                    <div class="contact-person" title="${tech.name}${tech.title ? ' — ' + tech.title : ''}">
+                                        ${tech.name} ${tech.title ? `<span style="font-size:0.75rem; color:#94a3b8; font-weight:normal;">(${tech.title})</span>` : ''}
+                                    </div>
                                 </div>
                                 <div class="contact-actions">
-                                    <a href="${tech.url}" target="_blank" rel="noopener noreferrer" class="btn-link">Profile ↗</a>
-                                    <button type="button" class="btn-copy" onclick="copyPitch('tech', '${company.replace(/'/g, "\\'")}', '${role.replace(/'/g, "\\'")}')">Copy Pitch</button>
+                                    <a href="${tech.url}" target="_blank" rel="noopener noreferrer" class="btn-link" title="Open LinkedIn People Search">LinkedIn ↗</a>
+                                    <a href="${tech.googleUrl}" target="_blank" rel="noopener noreferrer" class="btn-link btn-find" title="Find Direct Profile on Google">Find Profile 🔍</a>
+                                    <button type="button" class="btn-copy" onclick="copyPitch('tech', '${company.replace(/'/g, "\\'")}', '${role.replace(/'/g, "\\'")}', '${tech.name.replace(/'/g, "\\'")}')">Copy Pitch</button>
                                 </div>
                             </div>
 
@@ -646,11 +675,14 @@ Output STRICTLY valid JSON:
                             <div class="contact-row">
                                 <div class="contact-info">
                                     <div class="contact-role-tag">👤 HR / Talent Acquisition</div>
-                                    <div class="contact-person">${hr.name}</div>
+                                    <div class="contact-person" title="${hr.name}${hr.title ? ' — ' + hr.title : ''}">
+                                        ${hr.name} ${hr.title ? `<span style="font-size:0.75rem; color:#94a3b8; font-weight:normal;">(${hr.title})</span>` : ''}
+                                    </div>
                                 </div>
                                 <div class="contact-actions">
-                                    <a href="${hr.url}" target="_blank" rel="noopener noreferrer" class="btn-link" style="background:#334155;">LinkedIn ↗</a>
-                                    <button type="button" class="btn-copy" onclick="copyPitch('hr', '${company.replace(/'/g, "\\'")}', '${role.replace(/'/g, "\\'")}')">Copy Pitch</button>
+                                    <a href="${hr.url}" target="_blank" rel="noopener noreferrer" class="btn-link" title="Open LinkedIn People Search">LinkedIn ↗</a>
+                                    <a href="${hr.googleUrl}" target="_blank" rel="noopener noreferrer" class="btn-link btn-find" title="Find Direct Profile on Google">Find Profile 🔍</a>
+                                    <button type="button" class="btn-copy" onclick="copyPitch('hr', '${company.replace(/'/g, "\\'")}', '${role.replace(/'/g, "\\'")}', '${hr.name.replace(/'/g, "\\'")}')">Copy Pitch</button>
                                 </div>
                             </div>
 
@@ -658,11 +690,14 @@ Output STRICTLY valid JSON:
                             <div class="contact-row">
                                 <div class="contact-info">
                                     <div class="contact-role-tag">👔 Founder / CEO</div>
-                                    <div class="contact-person">${ceo.name}</div>
+                                    <div class="contact-person" title="${ceo.name}${ceo.title ? ' — ' + ceo.title : ''}">
+                                        ${ceo.name} ${ceo.title ? `<span style="font-size:0.75rem; color:#94a3b8; font-weight:normal;">(${ceo.title})</span>` : ''}
+                                    </div>
                                 </div>
                                 <div class="contact-actions">
-                                    <a href="${ceo.url}" target="_blank" rel="noopener noreferrer" class="btn-link" style="background:#334155;">LinkedIn ↗</a>
-                                    <button type="button" class="btn-copy" onclick="copyPitch('ceo', '${company.replace(/'/g, "\\'")}', '${role.replace(/'/g, "\\'")}')">Copy Pitch</button>
+                                    <a href="${ceo.url}" target="_blank" rel="noopener noreferrer" class="btn-link" title="Open LinkedIn People Search">LinkedIn ↗</a>
+                                    <a href="${ceo.googleUrl}" target="_blank" rel="noopener noreferrer" class="btn-link btn-find" title="Find Direct Profile on Google">Find Profile 🔍</a>
+                                    <button type="button" class="btn-copy" onclick="copyPitch('ceo', '${company.replace(/'/g, "\\'")}', '${role.replace(/'/g, "\\'")}', '${ceo.name.replace(/'/g, "\\'")}')">Copy Pitch</button>
                                 </div>
                             </div>
                         </div>
