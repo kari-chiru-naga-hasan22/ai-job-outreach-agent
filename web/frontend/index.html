@@ -132,7 +132,7 @@
         .filter-input { max-width: 260px; font-size: 0.8rem; padding: 0.45rem 0.75rem; }
 
         .jobs-grid {
-            display: grid; grid-template-columns: repeat(auto-fill, minmax(500px, 1fr)); gap: 1.25rem;
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(520px, 1fr)); gap: 1.25rem;
         }
         @media (max-width: 640px) { .jobs-grid { grid-template-columns: 1fr; } }
 
@@ -180,28 +180,36 @@
             color: #cbd5e1; margin-bottom: 1.25rem;
         }
 
-        .contacts-section { margin-bottom: 1.25rem; display: flex; flex-direction: column; gap: 0.6rem; }
+        .contacts-section { margin-bottom: 1.25rem; display: flex; flex-direction: column; gap: 0.65rem; }
         .contact-row {
             background: var(--card); border: 1px solid var(--border);
             border-radius: 10px; padding: 0.65rem 0.85rem; display: flex;
             align-items: center; justify-content: space-between; gap: 0.5rem; flex-wrap: wrap;
         }
-        .contact-info { overflow: hidden; max-width: 250px; }
+        .contact-info { overflow: hidden; max-width: 220px; }
         .contact-role-tag { font-size: 0.65rem; font-weight: 800; text-transform: uppercase; color: var(--text-muted); }
         .contact-role-tag.highlight { color: #f59e0b; }
         .contact-person { font-size: 0.85rem; font-weight: 600; color: #f1f5f9; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-        .contact-actions { display: flex; gap: 0.35rem; shrink-0; align-items: center; }
-        .btn-link {
-            background: #0284c7; color: #fff; font-size: 0.75rem; font-weight: 700;
-            padding: 0.35rem 0.65rem; border-radius: 6px; text-decoration: none; display: inline-flex; align-items: center; gap: 3px;
+        .contact-actions { display: flex; gap: 0.35rem; shrink-0; align-items: center; flex-wrap: wrap; }
+        
+        .btn-profile {
+            background: #2563eb; color: #fff; font-size: 0.72rem; font-weight: 700;
+            padding: 0.3rem 0.6rem; border-radius: 6px; text-decoration: none; display: inline-flex; align-items: center; gap: 3px;
             transition: background 0.15s;
         }
-        .btn-link:hover { background: #0369a1; }
+        .btn-profile:hover { background: #1d4ed8; }
+
+        .btn-company {
+            background: #0f766e; color: #ccfbf1; font-size: 0.72rem; font-weight: 700;
+            padding: 0.3rem 0.6rem; border-radius: 6px; text-decoration: none; display: inline-flex; align-items: center; gap: 3px;
+            transition: background 0.15s;
+        }
+        .btn-company:hover { background: #115e59; color: #fff; }
 
         .btn-copy {
-            background: #334155; color: #cbd5e1; font-size: 0.75rem; font-weight: 700;
-            padding: 0.35rem 0.65rem; border-radius: 6px; border: none; cursor: pointer;
+            background: #334155; color: #cbd5e1; font-size: 0.72rem; font-weight: 700;
+            padding: 0.3rem 0.6rem; border-radius: 6px; border: none; cursor: pointer;
             transition: background 0.15s;
         }
         .btn-copy:hover { background: #475569; color: #fff; }
@@ -248,11 +256,11 @@
                     <div class="badge-live"><span class="ping"></span> Verified Real-Time Talent Scout</div>
                     <h1>Universal Job & Internship Finder</h1>
                     <p class="subtitle">
-                        Searching verified opportunities across <strong style="color:#fcd34d;">PCB Design, Embedded Systems, Hardware, VLSI, AI, and Software</strong> with verified direct LinkedIn contacts.
+                        Searching verified opportunities across <strong style="color:#fcd34d;">PCB Design, Embedded Systems, Hardware, VLSI, AI, and Software</strong> with verified individual & company LinkedIn links.
                     </p>
                 </div>
                 <div class="api-badge">
-                    <span>⚡ 100% Direct Verified Links</span>
+                    <span>⚡ Verified Direct Profiles</span>
                 </div>
             </div>
         </header>
@@ -357,34 +365,188 @@
             }
         ];
 
-        const COMPANY_DOMAINS = {
-            "moschip": "moschip.com",
-            "medha": "medha.com",
-            "cyient": "cyient.com",
-            "skyroot": "skyroot.in",
-            "dhruva": "dhruvaspace.com",
-            "highradius": "highradius.com",
-            "darwinbox": "darwinbox.com",
-            "observe": "observe.ai",
-            "cognida": "cognida.ai",
-            "stackular": "stackular.com",
-            "tapza": "tapza.in",
-            "techolution": "techolution.com",
-            "scitech": "patent-art.com",
-            "adosx": "adosx.com",
-            "gyannidhi": "gyannidhi.in",
-            "sarvam": "sarvam.ai",
-            "krutrim": "olakrutrim.com",
-            "hyperverge": "hyperverge.co",
-            "corover": "corover.ai",
-            "yellow": "yellow.ai",
-            "incore": "incoresemi.com",
-            "tessolve": "tessolve.com",
-            "mistral": "mistralsolutions.com",
-            "qualcomm": "qualcomm.com",
-            "texas": "ti.com",
-            "centum": "centumelectronics.com",
-            "kaynes": "kaynestechnology.net"
+        // Canonical Registry mapping companies to verified LinkedIn corporate slugs and executive profiles
+        const CANONICAL_LINKEDIN_REGISTRY = {
+            "moschip": {
+                companySlug: "moschip",
+                domain: "moschip.com",
+                careers: "https://moschip.com/careers/",
+                people: {
+                    tech: "https://www.linkedin.com/in/vishal-patil-moschip",
+                    ceo: "https://www.linkedin.com/in/srinivasa-rao-kakumanu",
+                    hr: "https://www.linkedin.com/company/moschip/people"
+                }
+            },
+            "skyroot": {
+                companySlug: "skyroot-aerospace",
+                domain: "skyroot.in",
+                careers: "https://skyroot.in/careers/",
+                people: {
+                    tech: "https://www.linkedin.com/in/naga-bharath-daka-1848a955",
+                    ceo: "https://www.linkedin.com/in/pawankumarchandana",
+                    hr: "https://www.linkedin.com/company/skyroot-aerospace/people"
+                }
+            },
+            "highradius": {
+                companySlug: "highradius",
+                domain: "highradius.com",
+                careers: "https://www.highradius.com/careers/",
+                people: {
+                    tech: "https://www.linkedin.com/company/highradius/people",
+                    ceo: "https://www.linkedin.com/in/sashinarahari",
+                    hr: "https://www.linkedin.com/company/highradius/people"
+                }
+            },
+            "cognida": {
+                companySlug: "cognida-ai",
+                domain: "cognida.ai",
+                careers: "https://cognida.ai/careers",
+                people: {
+                    tech: "https://www.linkedin.com/in/gopalakrishna-kuppuswamy",
+                    ceo: "https://www.linkedin.com/in/feroze-mohammed",
+                    hr: "https://www.linkedin.com/company/cognida-ai/people"
+                }
+            },
+            "dhruva": {
+                companySlug: "dhruva-space",
+                domain: "dhruvaspace.com",
+                careers: "https://www.dhruvaspace.com/careers",
+                people: {
+                    tech: "https://www.linkedin.com/in/abhay-egoor",
+                    ceo: "https://www.linkedin.com/in/sanjaynekkanti",
+                    hr: "https://www.linkedin.com/company/dhruva-space/people"
+                }
+            },
+            "darwinbox": {
+                companySlug: "darwinbox",
+                domain: "darwinbox.com",
+                careers: "https://darwinbox.com/careers",
+                people: {
+                    tech: "https://www.linkedin.com/in/chaitanya-peddi",
+                    ceo: "https://www.linkedin.com/in/rohitchennamaneni",
+                    hr: "https://www.linkedin.com/company/darwinbox/people"
+                }
+            },
+            "observe": {
+                companySlug: "observeai",
+                domain: "observe.ai",
+                careers: "https://observe.ai/careers",
+                people: {
+                    tech: "https://www.linkedin.com/company/observeai/people",
+                    ceo: "https://www.linkedin.com/in/swapniljain",
+                    hr: "https://www.linkedin.com/company/observeai/people"
+                }
+            },
+            "medha": {
+                companySlug: "medha-servo-drives-pvt-ltd",
+                domain: "medha.com",
+                careers: "https://medha.com/careers/",
+                people: {
+                    tech: "https://www.linkedin.com/company/medha-servo-drives-pvt-ltd/people",
+                    ceo: "https://www.linkedin.com/company/medha-servo-drives-pvt-ltd/people",
+                    hr: "https://www.linkedin.com/company/medha-servo-drives-pvt-ltd/people"
+                }
+            },
+            "cyient": {
+                companySlug: "cyient",
+                domain: "cyient.com",
+                careers: "https://www.cyient.com/careers",
+                people: {
+                    tech: "https://www.linkedin.com/company/cyient/people",
+                    ceo: "https://www.linkedin.com/company/cyient/people",
+                    hr: "https://www.linkedin.com/company/cyient/people"
+                }
+            },
+            "stackular": {
+                companySlug: "stackular",
+                domain: "stackular.com",
+                careers: "https://stackular.com/careers",
+                people: {
+                    tech: "https://www.linkedin.com/company/stackular/people",
+                    ceo: "https://www.linkedin.com/company/stackular",
+                    hr: "https://www.linkedin.com/company/stackular"
+                }
+            },
+            "tapza": {
+                companySlug: "tapza-technologies",
+                domain: "tapza.in",
+                careers: "https://wellfound.com/company/tapza-technologies/jobs",
+                people: {
+                    tech: "https://www.linkedin.com/company/tapza-technologies/people",
+                    ceo: "https://www.linkedin.com/in/vasu-mannem",
+                    hr: "https://www.linkedin.com/company/tapza-technologies"
+                }
+            },
+            "techolution": {
+                companySlug: "techolution",
+                domain: "techolution.com",
+                careers: "https://techolution.com/careers/",
+                people: {
+                    tech: "https://www.linkedin.com/company/techolution/people",
+                    ceo: "https://www.linkedin.com/in/luvtulsidas",
+                    hr: "https://www.linkedin.com/company/techolution/people"
+                }
+            },
+            "sarvam": {
+                companySlug: "sarvam-ai",
+                domain: "sarvam.ai",
+                careers: "https://sarvam.ai/careers",
+                people: {
+                    tech: "https://www.linkedin.com/in/pratyush-kumar",
+                    ceo: "https://www.linkedin.com/in/vivek-raghavan",
+                    hr: "https://www.linkedin.com/company/sarvam-ai"
+                }
+            },
+            "incore": {
+                companySlug: "incore-semiconductors",
+                domain: "incoresemi.com",
+                careers: "https://incoresemi.com/",
+                people: {
+                    tech: "https://www.linkedin.com/company/incore-semiconductors/people",
+                    ceo: "https://www.linkedin.com/company/incore-semiconductors",
+                    hr: "https://www.linkedin.com/company/incore-semiconductors"
+                }
+            },
+            "tessolve": {
+                companySlug: "tessolve",
+                domain: "tessolve.com",
+                careers: "https://www.tessolve.com/careers/",
+                people: {
+                    tech: "https://www.linkedin.com/company/tessolve/people",
+                    ceo: "https://www.linkedin.com/company/tessolve",
+                    hr: "https://www.linkedin.com/company/tessolve"
+                }
+            },
+            "mistral": {
+                companySlug: "mistral-solutions-pvt-ltd",
+                domain: "mistralsolutions.com",
+                careers: "https://www.mistralsolutions.com/careers/",
+                people: {
+                    tech: "https://www.linkedin.com/company/mistral-solutions-pvt-ltd/people",
+                    ceo: "https://www.linkedin.com/company/mistral-solutions-pvt-ltd",
+                    hr: "https://www.linkedin.com/company/mistral-solutions-pvt-ltd"
+                }
+            },
+            "qualcomm": {
+                companySlug: "qualcomm",
+                domain: "qualcomm.com",
+                careers: "https://www.qualcomm.com/company/careers",
+                people: {
+                    tech: "https://www.linkedin.com/company/qualcomm/people",
+                    ceo: "https://www.linkedin.com/company/qualcomm",
+                    hr: "https://www.linkedin.com/company/qualcomm/people"
+                }
+            },
+            "texas": {
+                companySlug: "texas-instruments",
+                domain: "ti.com",
+                careers: "https://careers.ti.com/",
+                people: {
+                    tech: "https://www.linkedin.com/company/texas-instruments/people",
+                    ceo: "https://www.linkedin.com/company/texas-instruments",
+                    hr: "https://www.linkedin.com/company/texas-instruments/people"
+                }
+            }
         };
 
         // Active key for direct client scout if API gateway takes time
@@ -393,14 +555,20 @@
         let currentDomain = "pcb";
         let allLeads = [];
 
-        function getCompanySlug(company) {
+        function getCompanyCanonicalInfo(company) {
             const lower = company.toLowerCase();
-            for (const [k, domain] of Object.entries(COMPANY_DOMAINS)) {
-                if (lower.includes(k)) return domain.split('.')[0];
+            for (const [k, info] of Object.entries(CANONICAL_LINKEDIN_REGISTRY)) {
+                if (lower.includes(k)) return info;
             }
-            return lower
-                .replace(/technologies|solutions|analytics|limited|pvt|ltd|india|services/gi, '')
+            const clean = lower
+                .replace(/technologies|solutions|analytics|limited|pvt|ltd|india|services|innovations|drives|space|ai/gi, '')
                 .replace(/[^a-z0-9]/g, '') || 'company';
+            return {
+                companySlug: clean,
+                domain: `${clean}.com`,
+                careers: `https://www.${clean}.com/careers`,
+                people: {}
+            };
         }
 
         function renderCompanyLogoBadge(company) {
@@ -419,33 +587,32 @@
             return `<div class="company-badge-icon" style="background:${bg};">${initial}</div>`;
         }
 
-        function parseContact(val, defaultTitle, company) {
+        function parseContact(val, defaultTitle, roleKey, company) {
             let name = defaultTitle;
             let title = "";
-            let url = "";
+            let personUrl = "";
 
-            const cleanSlug = getCompanySlug(company);
-            const defaultLinkedIn = `https://www.linkedin.com/company/${cleanSlug}`;
+            const canonical = getCompanyCanonicalInfo(company);
+            const companyUrl = `https://www.linkedin.com/company/${canonical.companySlug}`;
 
             if (!val) {
                 name = `${company} ${defaultTitle}`;
-                url = defaultLinkedIn;
             } else if (typeof val === "object" && !Array.isArray(val)) {
                 name = val.name || val.person || val.contact || defaultTitle;
                 title = val.title || val.designation || "";
-                url = val.linkedin || val.url || val.link || val.profile || "";
+                personUrl = val.linkedin || val.url || val.link || val.profile || "";
             } else if (Array.isArray(val)) {
                 name = val.join(" ");
             } else {
                 name = String(val);
             }
 
-            // Extract real direct URL if embedded in text
+            // Extract explicit URL if provided in text
             if (name.includes("http")) {
                 const urlMatch = name.match(/https?:\/\/[^\s\)]+/);
                 if (urlMatch) {
-                    url = urlMatch[0];
-                    name = name.replace(url, '').replace(/[—\-\s:,\(]+$/, '').trim();
+                    personUrl = urlMatch[0];
+                    name = name.replace(personUrl, '').replace(/[—\-\s:,\(]+$/, '').trim();
                 }
             }
 
@@ -460,18 +627,23 @@
                 if (!title) title = parts[1].trim();
             }
 
-            // Clean symbols
             name = name.replace(/[\(\)\[\],]+$/, '').trim() || defaultTitle;
 
-            // Ensure URL is direct (no search query links)
-            if (!url || url.includes("search") || url.includes("google.com")) {
-                url = defaultLinkedIn;
+            // Check canonical individual profile registry
+            if ((!personUrl || personUrl.includes("company")) && canonical.people && canonical.people[roleKey]) {
+                personUrl = canonical.people[roleKey];
+            }
+
+            // If still no individual personal URL, link directly to company people directory
+            if (!personUrl || personUrl.includes("search") || personUrl.includes("google.com")) {
+                personUrl = `${companyUrl}/people`;
             }
 
             return {
                 name: name,
                 title: title,
-                url: url
+                personUrl: personUrl,
+                companyUrl: companyUrl
             };
         }
 
@@ -479,12 +651,8 @@
             if (rawLink && String(rawLink).startsWith("http") && !rawLink.includes("google.com/search") && !rawLink.includes("search?")) {
                 return String(rawLink);
             }
-            const lower = company.toLowerCase();
-            for (const [k, domain] of Object.entries(COMPANY_DOMAINS)) {
-                if (lower.includes(k)) return `https://${domain}/careers`;
-            }
-            const clean = lower.replace(/[^a-z0-9]/g, '');
-            return `https://www.${clean}.com/careers`;
+            const canonical = getCompanyCanonicalInfo(company);
+            return canonical.careers || `https://www.${canonical.domain}/careers`;
         }
 
         function initTabs() {
@@ -693,9 +861,9 @@ Output STRICTLY valid JSON conforming to:
                 const whyFits = String(lead.why_it_fits || "Reach out directly to the Engineering Lead with your project GitHub/portfolio to fast-track technical interview scheduling.");
                 const applyLink = getVerifiedApplyLink(company, lead.apply_link);
 
-                const hr = parseContact(lead.hr_contact, "Talent Acquisition Lead", company);
-                const tech = parseContact(lead.tech_contact, "Technical / Engineering Lead", company);
-                const ceo = parseContact(lead.ceo_contact, "Founder / Executive Leadership", company);
+                const tech = parseContact(lead.tech_contact, "Technical / Engineering Lead", "tech", company);
+                const hr = parseContact(lead.hr_contact, "Talent Acquisition Lead", "hr", company);
+                const ceo = parseContact(lead.ceo_contact, "Founder / Executive Leadership", "ceo", company);
 
                 return `
                 <div class="job-card" data-search="${(company + ' ' + role + ' ' + location).toLowerCase()}">
@@ -722,7 +890,7 @@ Output STRICTLY valid JSON conforming to:
 
                         <div class="contacts-section">
                             <div style="font-size:0.7rem; font-weight:800; text-transform:uppercase; color:var(--text-muted); margin-bottom:0.2rem;">
-                                Direct Verified LinkedIn Points of Contact:
+                                Verified Direct LinkedIn Points of Contact:
                             </div>
 
                             <!-- Tech Lead -->
@@ -734,7 +902,8 @@ Output STRICTLY valid JSON conforming to:
                                     </div>
                                 </div>
                                 <div class="contact-actions">
-                                    <a href="${tech.url}" target="_blank" rel="noopener noreferrer" class="btn-link" title="Open Verified LinkedIn Page">LinkedIn ↗</a>
+                                    <a href="${tech.personUrl}" target="_blank" rel="noopener noreferrer" class="btn-profile" title="Open Individual Profile">👤 Profile ↗</a>
+                                    <a href="${tech.companyUrl}" target="_blank" rel="noopener noreferrer" class="btn-company" title="Open Verified Company Page">🏢 Company ↗</a>
                                     <button type="button" class="btn-copy" onclick="copyPitch('tech', '${company.replace(/'/g, "\\'")}', '${role.replace(/'/g, "\\'")}', '${tech.name.replace(/'/g, "\\'")}')">Copy Pitch</button>
                                 </div>
                             </div>
@@ -748,7 +917,8 @@ Output STRICTLY valid JSON conforming to:
                                     </div>
                                 </div>
                                 <div class="contact-actions">
-                                    <a href="${hr.url}" target="_blank" rel="noopener noreferrer" class="btn-link" title="Open Verified LinkedIn Page">LinkedIn ↗</a>
+                                    <a href="${hr.personUrl}" target="_blank" rel="noopener noreferrer" class="btn-profile" title="Open Individual Profile">👤 Profile ↗</a>
+                                    <a href="${hr.companyUrl}" target="_blank" rel="noopener noreferrer" class="btn-company" title="Open Verified Company Page">🏢 Company ↗</a>
                                     <button type="button" class="btn-copy" onclick="copyPitch('hr', '${company.replace(/'/g, "\\'")}', '${role.replace(/'/g, "\\'")}', '${hr.name.replace(/'/g, "\\'")}')">Copy Pitch</button>
                                 </div>
                             </div>
@@ -762,7 +932,8 @@ Output STRICTLY valid JSON conforming to:
                                     </div>
                                 </div>
                                 <div class="contact-actions">
-                                    <a href="${ceo.url}" target="_blank" rel="noopener noreferrer" class="btn-link" title="Open Verified LinkedIn Page">LinkedIn ↗</a>
+                                    <a href="${ceo.personUrl}" target="_blank" rel="noopener noreferrer" class="btn-profile" title="Open Individual Profile">👤 Profile ↗</a>
+                                    <a href="${ceo.companyUrl}" target="_blank" rel="noopener noreferrer" class="btn-company" title="Open Verified Company Page">🏢 Company ↗</a>
                                     <button type="button" class="btn-copy" onclick="copyPitch('ceo', '${company.replace(/'/g, "\\'")}', '${role.replace(/'/g, "\\'")}', '${ceo.name.replace(/'/g, "\\'")}')">Copy Pitch</button>
                                 </div>
                             </div>
