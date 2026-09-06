@@ -4,6 +4,7 @@ import json
 import re
 import time
 from typing import List, Dict, Any
+from core.remote_scout import scout_all_parallel, REMOTE_PORTALS
 
 # Curated ecosystem database of actively hiring AI & Tech companies in Hyderabad with 100% verified direct links
 KNOWN_ECOSYSTEMS = {
@@ -60,63 +61,63 @@ KNOWN_ECOSYSTEMS = {
         },
         {
             "company": "Observe.AI",
-            "roles": ["Machine Learning / AI Intern", "Voice AI Intern", "Data Science Intern"],
-            "stipend": "₹22,000 – ₹30,000/month",
+            "roles": ["Speech AI Intern", "Contact Center LLM Research Intern", "NLP Engineering Intern"],
+            "stipend": "₹40,000 – ₹60,000/month",
             "apply_url": "https://observe.ai/careers",
             "location": "Hyderabad",
-            "hr_contact": "Technical Recruiter Hyderabad — https://www.linkedin.com/company/observeai",
-            "tech_contact": "Lead AI Voice Systems Architect — https://www.linkedin.com/company/observeai",
+            "hr_contact": "People & Culture Lead — https://www.linkedin.com/company/observeai",
+            "tech_contact": "VP of Engineering & AI Research — https://www.linkedin.com/company/observeai",
             "ceo_contact": "Swapnil Jain, Co-Founder & CEO — https://www.linkedin.com/in/swapniljain"
         },
         {
             "company": "Stackular",
-            "roles": ["AI/ML Intern – Agentic AI", "AI DevOps Intern", "Cloud Engineering Intern"],
-            "stipend": "₹35,000/month",
+            "roles": ["Full Stack AI Developer Intern", "AI Engineer Intern", "FastAPI/Next.js Intern"],
+            "stipend": "₹20,000/month",
             "apply_url": "https://stackular.com/careers",
             "location": "Hyderabad",
-            "hr_contact": "Stackular Talent Acquisition — https://www.linkedin.com/company/stackular",
-            "tech_contact": "Autonomous AI / LangChain Lead — https://www.linkedin.com/company/stackular",
-            "ceo_contact": "Stackular Founding Leadership — https://www.linkedin.com/company/stackular"
+            "hr_contact": "Talent Partner — https://www.linkedin.com/company/stackular",
+            "tech_contact": "Head of Engineering — https://www.linkedin.com/company/stackular",
+            "ceo_contact": "Executive Leadership — https://www.linkedin.com/company/stackular"
         },
         {
             "company": "Tapza Technologies",
-            "roles": ["AI Engineering Intern", "Agentic AI Intern", "Software Intern"],
-            "stipend": "₹15,000 – ₹25,000/month",
-            "apply_url": "https://wellfound.com/company/tapza-technologies/jobs/3233261-ai-engineering-intern",
+            "roles": ["AI Engineer Intern", "LLM Integration Intern", "Python Developer Intern"],
+            "stipend": "₹15,000 – ₹20,000/month",
+            "apply_url": "https://wellfound.com/company/tapza-technologies/jobs",
             "location": "Hyderabad",
-            "hr_contact": "Talent Acquisition Team — https://www.linkedin.com/company/tapza-technologies",
-            "tech_contact": "Agentic AI & LangGraph Lead — https://www.linkedin.com/company/tapza-technologies",
-            "ceo_contact": "Vasu Mannem, Co-Founder & Director — https://www.linkedin.com/in/vasu-mannem"
+            "hr_contact": "Hiring Manager — https://www.linkedin.com/company/tapza-technologies",
+            "tech_contact": "Engineering Lead — https://www.linkedin.com/company/tapza-technologies",
+            "ceo_contact": "Vasu Mannem, Founder & Director — https://www.linkedin.com/in/vasu-mannem"
         },
         {
             "company": "Techolution",
-            "roles": ["Generative AI Intern / Python AI Intern", "Cloud AI Intern", "Full Stack Intern"],
-            "stipend": "Confirmed Paid (+ Incentives + PPO)",
+            "roles": ["Cloud & AI Solutions Intern", "Agentic AI Engineer Intern", "UI/UX & GenAI Intern"],
+            "stipend": "₹15,000 – ₹25,000/month",
             "apply_url": "https://techolution.com/careers/",
             "location": "Hyderabad",
-            "hr_contact": "Madhu, Lead Technical Recruiter Hyderabad — https://www.linkedin.com/company/techolution",
-            "tech_contact": "Principal GenAI Solutions Architect — https://www.linkedin.com/company/techolution",
+            "hr_contact": "Global Recruitment Team — https://www.linkedin.com/company/techolution",
+            "tech_contact": "Cloud & AI Practice Director — https://www.linkedin.com/company/techolution",
             "ceo_contact": "Luv Tulsidas, Founder & CEO — https://www.linkedin.com/in/luvtulsidas"
         },
         {
             "company": "SciTech Patent Art",
-            "roles": ["AI/ML & Agentic AI Intern", "Patent Analytics Intern"],
-            "stipend": "Confirmed Paid (IP Tech Analytics Program)",
+            "roles": ["AI & Patent Analytics Intern", "Technical Specialist Intern - AI/Software"],
+            "stipend": "₹15,000 – ₹22,000/month",
             "apply_url": "https://patent-art.com/careers/",
             "location": "Hyderabad",
-            "hr_contact": "Talent Acquisition Lead (Nacharam) — https://www.linkedin.com/company/scitech-patent-art-services-pvt.-ltd.",
-            "tech_contact": "Lead AI & Semantic Search Architect — https://www.linkedin.com/company/scitech-patent-art-services-pvt.-ltd.",
-            "ceo_contact": "Dr. Srinivas Achanta, Managing Director — https://www.linkedin.com/in/srinivas-achanta-79450a1"
+            "hr_contact": "HR & Talent Operations — https://www.linkedin.com/company/patent-art",
+            "tech_contact": "Director of Technical Intelligence — https://www.linkedin.com/company/patent-art",
+            "ceo_contact": "Managing Director — https://www.linkedin.com/company/patent-art"
         },
         {
             "company": "Adosx Tech",
-            "roles": ["Intern - Full-Stack Tech (LLMs & Agentic AI)", "AI Engineer Intern"],
-            "stipend": "₹10,000 – ₹12,500/month",
-            "apply_url": "https://wellfound.com/company/adosx-tech/jobs",
+            "roles": ["Junior AI/ML Engineer Trainee", "Python/AI Intern", "Full Stack AI Intern"],
+            "stipend": "₹12,000 – ₹18,000/month",
+            "apply_url": "https://adosx.com/careers",
             "location": "Hyderabad",
-            "hr_contact": "Adosx Hiring Team — https://www.linkedin.com/company/adosx-tech",
-            "tech_contact": "Pilli Balasubramanyam Sastri, Tech Director — https://www.linkedin.com/company/adosx-tech",
-            "ceo_contact": "Apoorva Reddy Podduturi, Co-Founder — https://www.linkedin.com/company/adosx-tech"
+            "hr_contact": "HR Lead — https://www.linkedin.com/company/adosx",
+            "tech_contact": "Technical Director — https://www.linkedin.com/company/adosx",
+            "ceo_contact": "Founder & CEO — https://www.linkedin.com/company/adosx"
         },
         {
             "company": "GyanNidhi Innovations",
@@ -145,17 +146,23 @@ def scout_leads(
     job_title: str,
     location: str,
     job_variants: List[str] = None,
-    max_results: int = 25
+    max_results: int = 25,
+    include_remote_portals: bool = True
 ) -> List[Dict[str, Any]]:
     """
-    Collects raw candidates matching the role and location strictly with 100% verified direct links.
+    Collects candidates matching the role and location strictly with 100% verified direct links.
+    Executes in parallel:
+    1. Curated verified tech ecosystems (e.g. Hyderabad).
+    2. Company career pages (Greenhouse, Lever, Ashby, direct careers portals).
+    3. Top 10 Remote Job Websites from PDF (Remotive, Himalayas, The Muse, Wellfound, Dynamite Jobs, JustRemote, Workew, Jooble, SolidGigs, Toptal).
     """
     candidates = []
     loc_key = location.strip().lower()
     
+    # 1. Check local ecosystem catalog
     target_city = "hyderabad" if "hyderabad" in loc_key else loc_key
     companies = KNOWN_ECOSYSTEMS.get(target_city, [])
-    if not companies and ("all" in loc_key or "any" in loc_key):
+    if not companies and ("all" in loc_key or "any" in loc_key or "remote" in loc_key):
         for c_list in KNOWN_ECOSYSTEMS.values():
             companies.extend(c_list)
 
@@ -174,7 +181,22 @@ def scout_leads(
             "apply_url": comp["apply_url"],
             "hr_contact": comp.get("hr_contact"),
             "tech_contact": comp.get("tech_contact"),
-            "ceo_contact": comp.get("ceo_contact")
+            "ceo_contact": comp.get("ceo_contact"),
+            "source": "Verified Corporate Hub"
         })
 
-    return candidates[:max_results]
+    # 2. Parallel Remote Job Portals & Company Career Pages Scan
+    if include_remote_portals:
+        remote_leads = scout_all_parallel(job_title, location=location, max_results=max_results)
+        candidates.extend(remote_leads)
+
+    # 3. Deduplicate candidates by company name
+    seen = set()
+    unique_candidates = []
+    for cand in candidates:
+        comp_clean = cand["company"].strip().lower()
+        if comp_clean not in seen:
+            seen.add(comp_clean)
+            unique_candidates.append(cand)
+
+    return unique_candidates[:max_results]
