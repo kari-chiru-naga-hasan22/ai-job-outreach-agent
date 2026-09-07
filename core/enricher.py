@@ -127,10 +127,15 @@ def enrich_company_contacts(company: str, known_contacts: Dict[str, str] = None)
     else:
         ceo = f"Founding Leadership — {company_page}"
 
+    from core.apollo_enricher import generate_apollo_links
+    apollo_info = generate_apollo_links(company)
+
     return {
         "hr_contact": hr,
         "tech_contact": tech,
-        "ceo_contact": ceo
+        "ceo_contact": ceo,
+        "apollo_people_url": apollo_info["apollo_people_url"],
+        "apollo_company_url": apollo_info["apollo_company_url"]
     }
 
 def generate_cold_outreach_why_fits(company: str, role: str, location: str) -> str:

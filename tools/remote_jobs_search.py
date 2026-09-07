@@ -34,6 +34,8 @@ def format_table(leads):
         loc = lead.get("location", "Remote")[:20]
         print(f"{idx:<3} | {comp:<22} | {role:<35} | {src:<24} | {loc}")
         print(f"    🔗 Apply: {lead.get('apply_url')}")
+        if lead.get("contacts", {}).get("apollo_people_url"):
+            print(f"    🚀 Apollo Emails: {lead['contacts']['apollo_people_url']}")
     print(f"{'='*110}\n")
 
 def main():

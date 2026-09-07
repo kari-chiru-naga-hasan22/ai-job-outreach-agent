@@ -107,7 +107,9 @@ def run_pipeline():
             tech_contact=contacts["tech_contact"],
             ceo_contact=contacts["ceo_contact"],
             why_fits=why_fits,
-            dry_run=config.dry_run
+            dry_run=config.dry_run,
+            apollo_people_url=contacts.get("apollo_people_url"),
+            apollo_company_url=contacts.get("apollo_company_url")
         )
 
         if success:

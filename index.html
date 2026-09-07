@@ -215,12 +215,20 @@
         .btn-copy:hover { background: #475569; color: #fff; }
 
         .btn-apply-main {
-            display: block; width: 100%; text-align: center;
+            display: inline-flex; justify-content: center; align-items: center;
             background: linear-gradient(90deg, #2563eb, #4f46e5); color: #fff;
-            padding: 0.75rem; border-radius: 10px; font-weight: 800; font-size: 0.9rem;
-            text-decoration: none; transition: opacity 0.15s;
+            padding: 0.75rem 1rem; border-radius: 10px; font-weight: 800; font-size: 0.85rem;
+            text-decoration: none; transition: opacity 0.15s, transform 0.15s;
         }
-        .btn-apply-main:hover { opacity: 0.92; }
+        .btn-apply-main:hover { opacity: 0.92; transform: translateY(-1px); }
+
+        .btn-apollo {
+            display: inline-flex; justify-content: center; align-items: center;
+            background: linear-gradient(90deg, #ea580c, #f97316); color: #fff;
+            padding: 0.75rem 1rem; border-radius: 10px; font-weight: 800; font-size: 0.85rem;
+            text-decoration: none; transition: opacity 0.15s, transform 0.15s;
+        }
+        .btn-apollo:hover { opacity: 0.92; transform: translateY(-1px); }
 
         /* Shimmer Loading */
         .shimmer-card {
@@ -1107,9 +1115,14 @@ Output STRICTLY valid JSON conforming to:
                         </div>
                     </div>
 
-                    <a href="${applyLink}" target="_blank" rel="noopener noreferrer" class="btn-apply-main">
-                        🚀 Direct Verified Careers Link
-                    </a>
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:0.6rem; margin-top:1rem;">
+                        <a href="${applyLink}" target="_blank" rel="noopener noreferrer" class="btn-apply-main" title="Open Official Careers Page">
+                            🏢 Careers Page ↗
+                        </a>
+                        <a href="https://app.apollo.io/#/people?organizationExactNames[]=${encodeURIComponent(company)}&personTitles[]=Recruiter&personTitles[]=Talent&personTitles[]=HR&personTitles[]=Engineering&personTitles[]=Founder&personTitles[]=CEO&personTitles[]=CTO" target="_blank" rel="noopener noreferrer" class="btn-apollo" title="Find Verified Emails on Apollo.io">
+                            🚀 Apollo Emails ↗
+                        </a>
+                    </div>
                 </div>
                 `;
             }).join('');
