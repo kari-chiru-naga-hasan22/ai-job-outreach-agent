@@ -1,5 +1,4 @@
-import urllib.parse
-from typing import Dict, Any
+from typing import Dict
 
 CANONICAL_LINKEDIN_REGISTRY = {
     "moschip": {

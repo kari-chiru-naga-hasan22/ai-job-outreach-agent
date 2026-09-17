@@ -1,10 +1,8 @@
 import os
 import sys
-import json
 from pathlib import Path
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse, FileResponse
 from pydantic import BaseModel
 import uvicorn
@@ -87,17 +85,14 @@ async def search_jobs(req: UniversalSearchRequest):
         print(f"[SEARCH ERROR]: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Search failed: {str(e)}")
 
-# Mount frontend directory
-frontend_dir = Path(__file__).resolve().parent.parent / "frontend"
-if frontend_dir.exists():
-    app.mount("/static", StaticFiles(directory=str(frontend_dir)), name="static")
+# Serve canonical root index.html
+root_index = Path(__file__).resolve().parent.parent.parent / "index.html"
 
-    @app.get("/{full_path:path}")
-    async def serve_spa(full_path: str):
-        index_file = frontend_dir / "index.html"
-        if index_file.exists():
-            return FileResponse(str(index_file))
-        return HTMLResponse("<h1>Universal Job Scout</h1><p>Frontend is building...</p>")
+@app.get("/{full_path:path}")
+async def serve_spa(full_path: str):
+    if root_index.exists():
+        return FileResponse(str(root_index))
+    return HTMLResponse("<h1>Universal Job Scout</h1><p>Frontend is building...</p>")
 
 def start():
     port = int(os.getenv("PORT", 8000))

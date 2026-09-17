@@ -4,7 +4,7 @@ Generates direct Apollo.io people & verified email search URLs for any target co
 """
 
 import urllib.parse
-from typing import Dict, Any
+from typing import Dict
 
 def generate_apollo_links(company: str, domain: str = None) -> Dict[str, str]:
     """

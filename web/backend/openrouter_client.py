@@ -14,8 +14,6 @@ if env_path.exists():
 else:
     load_dotenv()
 
-from search_tools import TOOL_DEFINITIONS, execute_tool_call
-
 if sys.platform == "win32":
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 

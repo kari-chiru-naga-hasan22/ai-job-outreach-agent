@@ -22,7 +22,6 @@ Implements concurrent multi-source scanning across:
 import json
 import urllib.request
 import urllib.parse
-import re
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import List, Dict, Any, Optional
 
@@ -328,12 +327,11 @@ def scout_all_parallel(query: str, location: str = "Remote", max_results: int = 
         tasks[executor.submit(scout_company_career_pages, query, location)] = "company_careers"
 
         for future in as_completed(tasks):
-            source_name = tasks[future]
             try:
                 leads = future.result()
                 if leads:
                     aggregated_leads.extend(leads)
-            except Exception as e:
+            except Exception:
                 pass
 
     # Add curated portal access cards for remaining PDF boards

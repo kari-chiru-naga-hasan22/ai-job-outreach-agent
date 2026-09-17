@@ -23,7 +23,7 @@ def main():
     print("="*65)
     print("🚀 AI INTERNSHIP FINDER — WEB APPLICATION")
     print("="*65)
-    print(f"📍 Location Enforced : Hyderabad (Paid AI/ML/Agentic roles)")
+    print("📍 Location Enforced : Hyderabad (Paid AI/ML/Agentic roles)")
     print(f"🧠 OpenRouter Model  : {os.getenv('OPENROUTER_MODEL_ID', 'stealth/ox-alpha')}")
     print(f"🖥️  Web Server URL    : {app_url}")
     print("="*65 + "\n")

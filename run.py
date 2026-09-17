@@ -8,7 +8,6 @@ Usage:
     python run.py --dry-run
 """
 
-import os
 import sys
 import time
 from core.config_loader import load_config

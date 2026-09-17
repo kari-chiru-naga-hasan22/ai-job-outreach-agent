@@ -15,7 +15,6 @@ def verify_lead_eligibility(
     """
     Returns (is_eligible, reason_or_paid_status)
     """
-    company = raw_lead.get("company", "").strip()
     role = raw_lead.get("role", "").strip()
     location = raw_lead.get("location", "").strip()
     raw_pay = str(raw_lead.get("stipend", "") or raw_lead.get("paid_status", "")).strip()

@@ -1,8 +1,7 @@
 import urllib.request
 import urllib.parse
-import json
 import re
-from typing import List, Dict, Any
+from typing import Dict, Any
 
 # Tool schemas for OpenRouter OpenAI-compatible tool calling
 TOOL_DEFINITIONS = [

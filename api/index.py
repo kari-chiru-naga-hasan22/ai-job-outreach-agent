@@ -876,7 +876,7 @@ def get_curated_domain_leads(role: str, location: str, job_type: str, compensati
             "company": comp,
             "role": role,
             "location": f"{location}, India",
-            "paid_source": stipend,
+            "paid_source": comp_val if compensation and compensation != "Any" else stipend,
             "apply_link": link,
             "hr_contact": f"Talent Acquisition Team — https://www.linkedin.com/company/{slug}/people",
             "tech_contact": f"Engineering Leadership — https://www.linkedin.com/company/{slug}/people",

@@ -1,10 +1,6 @@
-import urllib.request
-import urllib.parse
-import json
 import re
-import time
 from typing import List, Dict, Any
-from core.remote_scout import scout_all_parallel, REMOTE_PORTALS
+from core.remote_scout import scout_all_parallel
 
 # Curated ecosystem database of actively hiring AI & Tech companies in Hyderabad with 100% verified direct links
 KNOWN_ECOSYSTEMS = {
