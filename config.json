@@ -1,11 +1,11 @@
 {
-  "job_title": "Embedded Systems Engineer Intern",
+  "job_title": "AI Engineer Intern",
   "job_variants": [
-    "Firmware Engineer",
-    "PCB Design Engineer",
-    "Hardware Design Intern",
-    "AI Engineer Intern",
-    "VLSI Intern"
+    "Agentic AI Engineer Intern",
+    "GenAI Intern",
+    "Machine Learning Intern",
+    "LLM Engineer Intern",
+    "AI Research Intern"
   ],
   "location": "Hyderabad",
   "job_type": "internship",
@@ -13,8 +13,8 @@
   "minimum_stipend_inr": 10000,
   "max_leads_per_run": 15,
   "telegram": {
-    "bot_token": "YOUR_BOT_TOKEN_HERE",
-    "chat_id": "YOUR_CHAT_ID_HERE",
-    "enabled": true
+    "bot_token": "",
+    "chat_id": "",
+    "enabled": false
   }
 }

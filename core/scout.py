@@ -138,9 +138,63 @@ KNOWN_ECOSYSTEMS = {
             "hr_contact": "J. Komali, Talent Acquisition Lead — https://www.linkedin.com/company/moschip",
             "tech_contact": "Vishal Patil, SVP Product Engineering — https://www.linkedin.com/company/moschip",
             "ceo_contact": "Srinivasa Rao Kakumanu, MD & CEO — https://www.linkedin.com/company/moschip"
+        },
+        {
+            "company": "Kore.ai",
+            "roles": ["Agentic AI Engineer Intern", "Enterprise Conversational AI Intern", "LLM Systems Trainee"],
+            "stipend": "₹30,000 – ₹45,000/month",
+            "apply_url": "https://kore.ai/careers/",
+            "location": "Hyderabad",
+            "hr_contact": "Talent Acquisition Lead — https://www.linkedin.com/company/kore-ai",
+            "tech_contact": "Prasanna Kumar Arikala, Chief Technology Officer — https://www.linkedin.com/in/prasanna-kumar-arikala-9696345",
+            "ceo_contact": "Raj Koneru, Founder & CEO — https://www.linkedin.com/in/rajkoneru"
+        },
+        {
+            "company": "Yellow.ai",
+            "roles": ["Autonomous AI Agent Engineer Intern", "DynamicNLP / GenAI Intern", "AI Systems Intern"],
+            "stipend": "₹30,000 – ₹45,000/month",
+            "apply_url": "https://yellow.ai/careers/",
+            "location": "Hyderabad",
+            "hr_contact": "Campus & University Talent Team — https://www.linkedin.com/company/yellowdotai",
+            "tech_contact": "Jaya Kishore Reddy, Co-Founder & CTO — https://www.linkedin.com/in/jayakishorereddy",
+            "ceo_contact": "Raghu Ravinutala, Co-Founder & CEO — https://www.linkedin.com/in/raghuravinutala"
         }
     ]
 }
+
+def _score_role(role_title: str, query: str, variants: List[str] = None) -> int:
+    r_lower = role_title.lower()
+    q_lower = query.lower()
+    
+    if q_lower in r_lower or r_lower in q_lower:
+        return 100
+
+    score = 0
+    q_tokens = set(re.findall(r"\w+", q_lower)) - {"intern", "internship", "internships", "trainee", "in", "for", "the", "and"}
+    r_tokens = set(re.findall(r"\w+", r_lower))
+    
+    if "agentic" in q_tokens and any(k in r_lower for k in ["agentic", "autonomous", "agent"]):
+        score += 50
+    if "agentic" in q_tokens and "llm" in r_lower:
+        score += 35
+    if "genai" in q_tokens and any(k in r_lower for k in ["genai", "generative"]):
+        score += 30
+    if "llm" in q_tokens and "llm" in r_lower:
+        score += 30
+    if "embedded" in q_tokens and any(k in r_lower for k in ["embedded", "firmware", "iot"]):
+        score += 40
+    if "pcb" in q_tokens and any(k in r_lower for k in ["pcb", "hardware", "vlsi"]):
+        score += 40
+        
+    score += len(q_tokens & r_tokens) * 10
+    
+    for var in (variants or []):
+        v_tokens = set(re.findall(r"\w+", var.lower())) - {"intern", "internship", "internships", "trainee"}
+        score += len(v_tokens & r_tokens) * 3
+        if var.lower() in r_lower:
+            score += 15
+
+    return score
 
 def scout_leads(
     job_title: str,
@@ -166,14 +220,12 @@ def scout_leads(
         for c_list in KNOWN_ECOSYSTEMS.values():
             companies.extend(c_list)
 
+    scored_candidates = []
     for comp in companies:
-        matched_role = comp["roles"][0]
-        for r in comp["roles"]:
-            if any(term.lower() in r.lower() for term in (job_variants or [job_title])):
-                matched_role = r
-                break
+        matched_role = max(comp["roles"], key=lambda r: _score_role(r, job_title, job_variants))
+        score = _score_role(matched_role, job_title, job_variants)
         
-        candidates.append({
+        scored_candidates.append((score, {
             "company": comp["company"],
             "role": matched_role,
             "location": comp["location"],
@@ -183,7 +235,11 @@ def scout_leads(
             "tech_contact": comp.get("tech_contact"),
             "ceo_contact": comp.get("ceo_contact"),
             "source": "Verified Corporate Hub"
-        })
+        }))
+
+    # Sort descending by relevance score
+    scored_candidates.sort(key=lambda x: x[0], reverse=True)
+    candidates.extend([cand for _, cand in scored_candidates])
 
     # 2. Parallel Remote Job Portals & Company Career Pages Scan
     if include_remote_portals:

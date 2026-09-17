@@ -1,1 +1,1 @@
-from .scout import scout_leads
+# Core package for Job Outreach Agent

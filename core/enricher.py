@@ -73,6 +73,18 @@ CANONICAL_LINKEDIN_REGISTRY = {
         "tech": "https://www.linkedin.com/in/pratyush-kumar",
         "ceo": "https://www.linkedin.com/in/vivek-raghavan",
         "hr": "https://www.linkedin.com/company/sarvam-ai"
+    },
+    "kore": {
+        "slug": "kore-ai",
+        "tech": "https://www.linkedin.com/in/prasanna-kumar-arikala-9696345",
+        "ceo": "https://www.linkedin.com/in/rajkoneru",
+        "hr": "https://www.linkedin.com/company/kore-ai/people"
+    },
+    "yellow": {
+        "slug": "yellowdotai",
+        "tech": "https://www.linkedin.com/in/jayakishorereddy",
+        "ceo": "https://www.linkedin.com/in/raghuravinutala",
+        "hr": "https://www.linkedin.com/company/yellowdotai/people"
     }
 }
 

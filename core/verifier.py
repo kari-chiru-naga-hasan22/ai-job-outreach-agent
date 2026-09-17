@@ -1,56 +1,46 @@
-import os
-import sys
-import json
 import re
-from typing import List, Dict, Any, Tuple
+from typing import Dict, Any, Tuple
 
-if sys.platform == "win32":
-    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
-
-UNPAID_PATTERN = re.compile(r'\b(unpaid|volunteer|no\s+stipend|₹?\s*0\s*/\s*month|zero\s+stipend)\b', re.IGNORECASE)
-
-def verify_stipend_status(stipend_str: str, min_stipend_inr: int = 10000) -> Tuple[bool, str]:
-    if not stipend_str:
-        return False, "Unspecified Compensation"
-    s_lower = stipend_str.lower()
-    if UNPAID_PATTERN.search(s_lower):
-        return False, "Explicitly Unpaid / Volunteer Role"
-    if "confirmed paid" in s_lower or "paid" in s_lower or "ppo" in s_lower:
-        return True, stipend_str
-    numbers = re.findall(r'(\d+[\d,.]*)', stipend_str)
-    if numbers:
-        try:
-            val = int(numbers[0].replace(',', '').split('.')[0])
-            if val < 100 and "k" in s_lower:
-                val *= 1000
-            if val >= min_stipend_inr or val >= 5000:
-                return True, stipend_str
-        except Exception:
-            pass
-    return True, stipend_str
-
-def verify_location_match(company_loc: str, target_loc: str) -> bool:
-    if not company_loc or not target_loc:
-        return True
-    c_lower = company_loc.lower()
-    t_lower = target_loc.lower()
-    if t_lower in ["any", "all", "remote", "india"]:
-        return True
-    return t_lower in c_lower or c_lower in t_lower
+UNPAID_PATTERN = re.compile(
+    r"\b(unpaid|volunteer|no\s+stipend|₹?\s*0\s*/\s*month|zero\s+stipend|certificate\s+only|un-paid)\b",
+    re.IGNORECASE
+)
 
 def verify_lead_eligibility(
     raw_lead: Dict[str, Any],
-    target_location: str = "Hyderabad",
+    target_location: str,
     paid_only: bool = True,
-    min_stipend_inr: int = 10000
+    min_stipend_inr: int = 0
 ) -> Tuple[bool, str]:
-    loc = raw_lead.get("location", "")
-    if not verify_location_match(loc, target_location):
-        return False, f"Location mismatch: '{loc}' is outside '{target_location}'"
-    stipend = raw_lead.get("stipend", "")
+    """
+    Returns (is_eligible, reason_or_paid_status)
+    """
+    company = raw_lead.get("company", "").strip()
+    role = raw_lead.get("role", "").strip()
+    location = raw_lead.get("location", "").strip()
+    raw_pay = str(raw_lead.get("stipend", "") or raw_lead.get("paid_status", "")).strip()
+
+    # 1. Location verification
+    if target_location.lower() not in ["any", "all", "remote"]:
+        if target_location.lower() not in location.lower() and location.lower() not in target_location.lower():
+            return False, f"Location mismatch: {location} does not match {target_location}"
+
+    # 2. Unpaid check via regex word boundaries
+    if UNPAID_PATTERN.search(raw_pay) or UNPAID_PATTERN.search(role):
+        if paid_only:
+            return False, f"Unpaid position: {raw_pay}"
+
+    # 3. Pay extraction & validation
     if paid_only:
-        is_paid, reason = verify_stipend_status(stipend, min_stipend_inr=min_stipend_inr)
-        if not is_paid:
-            return False, f"Not confirmed paid: {reason}"
-        return True, reason
-    return True, stipend or "Unspecified"
+        if not raw_pay or raw_pay.lower() in ["unknown", "none", "unclear"]:
+            return False, "Pay status unconfirmed"
+
+        # Check numeric minimum if present
+        nums = re.findall(r"(\d[\d,]+)", raw_pay.replace(",", ""))
+        if nums and min_stipend_inr > 0:
+            found_stipend = int(nums[0])
+            if 0 < found_stipend < min_stipend_inr:
+                return False, f"Stipend ₹{found_stipend} below minimum ₹{min_stipend_inr}"
+
+    paid_status = raw_pay if raw_pay.startswith("Confirmed") else f"Confirmed ({raw_pay})"
+    return True, paid_status

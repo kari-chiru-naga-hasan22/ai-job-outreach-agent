@@ -1,5 +1,5 @@
-import sys
 import os
+import sys
 import webbrowser
 import threading
 import time
@@ -21,13 +21,14 @@ def main():
     app_url = f"http://localhost:{port}"
 
     print("="*65)
-    print("🚀 UNIVERSAL JOB & INTERNSHIP FINDER — WEB APPLICATION")
+    print("🚀 AI INTERNSHIP FINDER — WEB APPLICATION")
     print("="*65)
-    print(f"📍 Location Enforced : Any / Hyderabad (Embedded, PCB, AI, VLSI, Software)")
-    print(f"🧠 OpenRouter Model  : {os.getenv('OPENROUTER_MODEL_ID', 'meta-llama/llama-3.3-70b-instruct')}")
+    print(f"📍 Location Enforced : Hyderabad (Paid AI/ML/Agentic roles)")
+    print(f"🧠 OpenRouter Model  : {os.getenv('OPENROUTER_MODEL_ID', 'stealth/ox-alpha')}")
     print(f"🖥️  Web Server URL    : {app_url}")
     print("="*65 + "\n")
 
+    # Start browser in background
     threading.Thread(target=open_browser, args=(app_url,), daemon=True).start()
 
     import uvicorn

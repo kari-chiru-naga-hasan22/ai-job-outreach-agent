@@ -8,8 +8,8 @@ from typing import Optional, Dict, Any
 if sys.platform == "win32":
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
-BOT_TOKEN = "8896872040:AAHldcdXbxY6lcDuPp1dot7LudlugmPz8Tg"
-CHAT_ID = "8142053680"
+BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "")
+CHAT_ID = os.getenv("TELEGRAM_CHAT_ID", "")
 LOG_FILE = os.path.join(os.path.dirname(__file__), "dispatched_leads.json")
 
 def get_company_slug(company: str) -> str:
